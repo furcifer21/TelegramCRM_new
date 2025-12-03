@@ -11,8 +11,7 @@
 
 .layout-main {
   flex: 1;
-  padding: var(--spacing);
-  padding-bottom: 80px; // Отступ снизу для навигации
   @include container;
+  padding: 80px var(--spacing);
 }
 

@@ -11,9 +11,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { getTelegramUser, getTelegramWebApp } from '../lib/telegram';
-import { getClients, getReminders, getActiveReminders } from '../lib/crm';
+import { getClients, getReminders, getActiveReminders, getNotes } from '../lib/crm';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import { ClockIcon, FileTextIcon, UsersIcon, PlusIcon } from '../components/Icons';
 
 export default function Home() {
   const router = useRouter();
@@ -22,6 +23,7 @@ export default function Home() {
     clientsCount: 0,
     remindersCount: 0,
     activeRemindersCount: 0,
+    notesCount: 0,
   });
   const [loading, setLoading] = useState(true);
   
@@ -45,14 +47,18 @@ export default function Home() {
   const loadStats = async () => {
     setLoading(true);
     try {
-      const clients = await getClients();
-      const reminders = await getReminders();
-      const activeReminders = await getActiveReminders();
+      const [clients, reminders, activeReminders, notes] = await Promise.all([
+        getClients(),
+        getReminders(),
+        getActiveReminders(),
+        getNotes()
+      ]);
       
       setStats({
         clientsCount: clients.length,
         remindersCount: reminders.length,
         activeRemindersCount: activeReminders.length,
+        notesCount: notes.length,
       });
     } catch (error) {
       console.error('Error loading stats:', error);
@@ -107,6 +113,27 @@ export default function Home() {
     router.push('/reminder/new');
   };
   
+  /**
+   * Переход на страницу всех напоминаний
+   */
+  const handleViewReminders = () => {
+    router.push('/reminders');
+  };
+  
+  /**
+   * Переход на страницу всех заметок
+   */
+  const handleViewNotes = () => {
+    router.push('/notes');
+  };
+  
+  /**
+   * Переход на страницу создания заметки
+   */
+  const handleCreateNote = () => {
+    router.push('/notes/new');
+  };
+  
   return (
     <div className="home">
       <h1 className="home-title">
@@ -143,13 +170,42 @@ export default function Home() {
         <h2 className="home-card-title">Быстрые действия</h2>
         <div className="home-actions">
           <Button onClick={handleAddClient} className="action-button">
-            ➕ Добавить клиента
+            <PlusIcon className="action-icon" />
+            Добавить клиента
           </Button>
           <Button onClick={handleViewClients} variant="secondary" className="action-button">
-            👥 Все клиенты
+            <UsersIcon className="action-icon" />
+            Все клиенты
+          </Button>
+        </div>
+      </Card>
+      
+      {/* Напоминания */}
+      <Card>
+        <h2 className="home-card-title">Напоминания</h2>
+        <div className="home-actions">
+          <Button onClick={handleViewReminders} variant="secondary" className="action-button">
+            <ClockIcon className="action-icon" />
+            Все напоминания
           </Button>
           <Button onClick={handleCreateReminder} variant="secondary" className="action-button">
-            ⏰ Создать напоминание
+            <PlusIcon className="action-icon" />
+            Создать напоминание
+          </Button>
+        </div>
+      </Card>
+      
+      {/* Заметки */}
+      <Card>
+        <h2 className="home-card-title">Заметки</h2>
+        <div className="home-actions">
+          <Button onClick={handleViewNotes} variant="secondary" className="action-button">
+            <FileTextIcon className="action-icon" />
+            Все заметки
+          </Button>
+          <Button onClick={handleCreateNote} variant="secondary" className="action-button">
+            <PlusIcon className="action-icon" />
+            Создать заметку
           </Button>
         </div>
       </Card>

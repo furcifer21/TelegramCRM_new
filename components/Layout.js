@@ -45,10 +45,16 @@ export default function Layout({ children }) {
         if (activeReminders.length > 0 && webApp) {
           // Показываем уведомление для каждого активного напоминания
           for (const reminder of activeReminders) {
-            // Показываем уведомление
-            webApp.showAlert(reminder.text || 'У вас есть напоминание!');
+            // Формируем текст сообщения
+            const messageText = `⏰ Напоминание\n\n${reminder.text || 'У вас есть напоминание!'}`;
             
-            // Помечаем как уведомленное
+            // Показываем уведомление в чате через showAlert
+            webApp.showAlert(messageText);
+            
+            // Отправляем данные в бота (если бэкенд настроен)
+            // webApp.sendData(JSON.stringify({ type: 'reminder', id: reminder.id, text: reminder.text }));
+            
+            // Помечаем как уведомленное и архивируем
             await markReminderAsNotified(reminder.id);
             
             // Тактильная обратная связь

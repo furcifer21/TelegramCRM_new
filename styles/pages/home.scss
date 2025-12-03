@@ -100,10 +100,13 @@
 .home-actions {
   display: flex;
   flex-direction: column;
-  gap: $spacing-sm;
+  gap: $spacing-md;
 }
 
 .action-button {
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 

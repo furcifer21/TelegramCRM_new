@@ -18,6 +18,8 @@ export default function App({ Component, pageProps }) {
       <Head>
         {/* Подключаем скрипт Telegram WebApp для работы Mini App */}
         <script src="https://telegram.org/js/telegram-web-app.js" />
+        {/* Подключаем sprite.svg с иконками */}
+        <link rel="preload" href="/sprite.svg" as="image" />
       </Head>
       <Layout>
         <Component {...pageProps} />

@@ -1,0 +1,186 @@
+@import '../variables.scss';
+@import '../mixins.scss';
+
+.reminders-page,
+.reminders-archive-page {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+  
+  .page-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--tg-theme-text-color);
+    flex: 1;
+  }
+  
+  .page-actions {
+    display: flex;
+    gap: $spacing-sm;
+  }
+  
+  .back-button {
+    width: auto;
+    padding: $spacing-sm;
+    margin-right: $spacing-sm;
+    margin-bottom: 0;
+  }
+}
+
+.search-group {
+  margin-bottom: 0;
+}
+
+.search-input {
+  width: 100%;
+  padding: $spacing-sm $spacing-md;
+  font-size: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--tg-theme-bg-color);
+  color: var(--tg-theme-text-color);
+  
+  &:focus {
+    border-color: var(--tg-theme-button-color);
+    outline: none;
+  }
+  
+  &::placeholder {
+    color: var(--tg-theme-hint-color);
+  }
+}
+
+.reminders-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.reminder-card {
+  padding: $spacing-md;
+  margin-bottom: 0;
+  
+  &.overdue {
+    border-left: 4px solid $error-color;
+  }
+  
+  &.archived {
+    opacity: 0.7;
+  }
+}
+
+.reminder-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.reminder-info {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-sm;
+  flex: 1;
+}
+
+.reminder-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--tg-theme-button-color);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.reminder-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--tg-theme-text-color);
+  margin-bottom: $spacing-xs;
+}
+
+.reminder-client {
+  font-size: 14px;
+  color: var(--tg-theme-hint-color);
+}
+
+.reminder-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: $spacing-sm;
+  padding-top: $spacing-sm;
+  border-top: 1px solid var(--tg-theme-secondary-bg-color);
+}
+
+.reminder-date {
+  font-size: 14px;
+  color: var(--tg-theme-hint-color);
+}
+
+.reminder-time {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--tg-theme-button-color);
+  
+  &.overdue {
+    color: $error-color;
+  }
+}
+
+.reminder-archived {
+  font-size: 12px;
+  color: var(--tg-theme-hint-color);
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  padding: $spacing-xs;
+  cursor: pointer;
+  color: var(--tg-theme-hint-color);
+  transition: color 0.2s;
+  
+  &:hover {
+    color: $error-color;
+  }
+  
+  .icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: $spacing-xl 0;
+  
+  .empty-icon {
+    width: 48px;
+    height: 48px;
+    color: var(--tg-theme-hint-color);
+    margin-bottom: $spacing-md;
+  }
+  
+  p {
+    color: var(--tg-theme-hint-color);
+    margin-bottom: $spacing-md;
+  }
+}
+
+.icon-button {
+  width: auto;
+  padding: $spacing-sm;
+  margin-bottom: 0;
+  
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+

@@ -38,8 +38,11 @@
 }
 
 .nav-icon {
-  font-size: 24px;
+  width: 24px;
+  height: 24px;
   margin-bottom: $spacing-xs;
+  stroke: currentColor;
+  fill: none;
 }
 
 .nav-label {

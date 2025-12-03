@@ -6,6 +6,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { HomeIcon, UsersIcon } from './Icons';
 
 export default function Navigation({ currentPath }) {
   const router = useRouter();
@@ -15,12 +16,12 @@ export default function Navigation({ currentPath }) {
     {
       path: '/',
       label: 'Главная',
-      icon: '🏠', // Можно заменить на SVG иконки
+      icon: HomeIcon,
     },
     {
       path: '/clients',
       label: 'Клиенты',
-      icon: '👥',
+      icon: UsersIcon,
     },
   ];
   
@@ -28,6 +29,7 @@ export default function Navigation({ currentPath }) {
     <nav className="navigation">
       {navItems.map((item) => {
         const isActive = currentPath === item.path;
+        const IconComponent = item.icon;
         
         return (
           <Link
@@ -35,7 +37,7 @@ export default function Navigation({ currentPath }) {
             href={item.path}
             className={`nav-item ${isActive ? 'active' : ''}`}
           >
-            <span className="nav-icon">{item.icon}</span>
+            <IconComponent className="nav-icon" />
             <span className="nav-label">{item.label}</span>
           </Link>
         );

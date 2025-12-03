@@ -16,6 +16,8 @@
 @import './pages/client-detail.scss';
 @import './pages/profile.scss';
 @import './pages/settings.scss';
+@import './pages/reminders.scss';
+@import './pages/notes.scss';
 
 // Переменные для цветов (можно использовать цвета из Telegram)
 :root {
@@ -33,7 +35,7 @@
   --secondary-color: #f1f1f1;
   --border-color: #e0e0e0;
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --border-radius: 12px;
+  --border-radius: 8px;
   --spacing: 16px;
 }
 
@@ -74,7 +76,7 @@ a {
   text-decoration: none;
   
   &:hover {
-    text-decoration: underline;
+    text-decoration: none;
   }
 }
 

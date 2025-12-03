@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { getClient, updateClient } from '../../../lib/crm';
 import { getTelegramWebApp } from '../../../lib/telegram';
+import { unformatPhone, formatPhone, PHONE_FORMATS } from '../../../lib/phoneMask';
 import Card from '../../../components/Card';
 import Button from '../../../components/Button';
 import Input from '../../../components/Input';
@@ -29,6 +30,7 @@ export default function EditClient() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
+  const [phoneFormat, setPhoneFormat] = useState(PHONE_FORMATS.MD);
   
   // Загружаем данные клиента
   useEffect(() => {
@@ -54,7 +56,7 @@ export default function EditClient() {
       
       setFormData({
         name: client.name || '',
-        phone: client.phone || '',
+        phone: client.phone ? formatPhone(client.phone) : '',
         email: client.email || '',
         company: client.company || '',
         notes: client.notes || '',
@@ -120,7 +122,12 @@ export default function EditClient() {
     setSaving(true);
     
     try {
-      await updateClient(id, formData);
+      // Сохраняем телефон без форматирования
+      const clientData = {
+        ...formData,
+        phone: formData.phone ? unformatPhone(formData.phone) : '',
+      };
+      await updateClient(id, clientData);
       
       if (webApp?.HapticFeedback) {
         webApp.HapticFeedback.notificationOccurred('success');
@@ -175,12 +182,25 @@ export default function EditClient() {
           />
           {errors.name && <p className="error-text">{errors.name}</p>}
           
+          <div className="input-group">
+            <label className="input-label">Формат телефона</label>
+            <select
+              value={phoneFormat}
+              onChange={(e) => setPhoneFormat(e.target.value)}
+              className="input-field"
+            >
+              <option value={PHONE_FORMATS.MD}>Молдавский (+373)</option>
+              <option value={PHONE_FORMATS.UA}>Украинский (+380)</option>
+            </select>
+          </div>
+          
           <Input
             label="Телефон"
             type="tel"
             value={formData.phone}
             onChange={(e) => handleChange('phone', e.target.value)}
-            placeholder="+7 (999) 123-45-67"
+            phoneMask={true}
+            phoneFormat={phoneFormat}
           />
           
           <Input
