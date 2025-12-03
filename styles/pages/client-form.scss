@@ -1,0 +1,26 @@
+@import '../variables.scss';
+@import '../mixins.scss';
+
+.client-form-page,
+.reminder-form-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding-bottom: 80px; // Для навигации
+}
+
+.client-form,
+.reminder-form {
+  padding: 0 $spacing-md;
+}
+
+.form-actions {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-lg;
+  padding: 0 $spacing-md;
+  
+  .button {
+    flex: 1;
+  }
+}
+

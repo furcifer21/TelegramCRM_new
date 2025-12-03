@@ -1,0 +1,61 @@
+@import '../variables.scss';
+@import '../mixins.scss';
+
+.input-group {
+  margin-bottom: $spacing-md;
+}
+
+.input-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: $spacing-xs;
+  color: var(--tg-theme-text-color);
+}
+
+.input-required {
+  color: $error-color;
+  margin-left: 2px;
+}
+
+.input-field {
+  width: 100%;
+  padding: $spacing-sm $spacing-md;
+  font-size: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: $radius-md;
+  background-color: var(--tg-theme-bg-color);
+  color: var(--tg-theme-text-color);
+  transition: border-color 0.2s;
+  
+  &:focus {
+    border-color: var(--tg-theme-button-color);
+    outline: none;
+  }
+  
+  &.input-error {
+    border-color: $error-color;
+  }
+  
+  &::placeholder {
+    color: var(--tg-theme-hint-color);
+  }
+}
+
+.textarea-field {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+.error-text {
+  color: $error-color;
+  font-size: 12px;
+  margin-top: $spacing-xs;
+  margin-bottom: $spacing-sm;
+}
+
+select.input-field {
+  cursor: pointer;
+}
+

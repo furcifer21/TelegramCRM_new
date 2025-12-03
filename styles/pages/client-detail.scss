@@ -1,0 +1,135 @@
+@import '../variables.scss';
+@import '../mixins.scss';
+
+.client-detail-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding-bottom: 80px; // Для навигации
+}
+
+.client-info {
+  margin-bottom: $spacing-md;
+}
+
+.info-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: $spacing-md;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.info-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tg-theme-hint-color);
+  margin-bottom: $spacing-xs;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  font-size: 16px;
+  color: var(--tg-theme-text-color);
+  word-break: break-word;
+}
+
+.info-link {
+  color: var(--tg-theme-link-color);
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.client-actions {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1px solid var(--border-color);
+  
+  .button {
+    flex: 1;
+  }
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--tg-theme-text-color);
+  margin: 0;
+}
+
+.empty-section {
+  color: var(--tg-theme-hint-color);
+  font-style: italic;
+  text-align: center;
+  padding: $spacing-lg;
+  margin: 0;
+}
+
+.notes-list,
+.reminders-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.note-item,
+.reminder-item {
+  padding: $spacing-md;
+  background-color: var(--tg-theme-secondary-bg-color);
+  border-radius: $radius-md;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $spacing-sm;
+}
+
+.reminder-item.reminder-past {
+  border-left: 4px solid $error-color;
+}
+
+.note-text,
+.reminder-text {
+  font-size: 14px;
+  color: var(--tg-theme-text-color);
+  margin: 0 0 $spacing-xs 0;
+  flex: 1;
+}
+
+.note-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: $spacing-xs;
+}
+
+.note-date,
+.reminder-date {
+  font-size: 12px;
+  color: var(--tg-theme-hint-color);
+}
+
+.note-delete-button,
+.reminder-delete-button {
+  padding: $spacing-xs;
+  min-width: auto;
+  font-size: 16px;
+}
+
+.reminder-content {
+  flex: 1;
+}
+

@@ -1,0 +1,123 @@
+@import '../variables.scss';
+@import '../mixins.scss';
+
+.clients-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding-bottom: 80px; // Для навигации
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+  padding: 0 $spacing-md;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--tg-theme-text-color);
+  margin: 0;
+}
+
+.search-section {
+  padding: 0 $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.search-input {
+  .input-field {
+    border-radius: $radius-full;
+    padding: $spacing-sm $spacing-lg;
+  }
+}
+
+.clients-list {
+  padding: 0 $spacing-md;
+}
+
+.client-card {
+  margin-bottom: $spacing-md;
+  padding: 0;
+  overflow: hidden;
+}
+
+.client-card-content {
+  padding: $spacing-md;
+  cursor: pointer;
+}
+
+.client-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.client-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--tg-theme-text-color);
+  margin: 0;
+}
+
+.client-company {
+  font-size: 14px;
+  color: var(--tg-theme-hint-color);
+  background-color: var(--tg-theme-secondary-bg-color);
+  padding: 2px $spacing-sm;
+  border-radius: $radius-sm;
+}
+
+.client-card-info {
+  margin-top: $spacing-sm;
+}
+
+.client-info-item {
+  font-size: 14px;
+  color: var(--tg-theme-text-color);
+  margin: $spacing-xs 0;
+}
+
+.client-card-actions {
+  display: flex;
+  gap: $spacing-xs;
+  padding: $spacing-sm $spacing-md;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--tg-theme-secondary-bg-color);
+}
+
+.client-action-button {
+  flex: 1;
+  padding: $spacing-xs;
+  font-size: 18px;
+}
+
+.clients-stats {
+  margin-top: $spacing-md;
+  text-align: center;
+  padding: $spacing-md;
+}
+
+.stats-text {
+  color: var(--tg-theme-hint-color);
+  font-size: 14px;
+  margin: 0;
+  
+  strong {
+    color: var(--tg-theme-text-color);
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: $spacing-xl;
+}
+
+.empty-state-text {
+  color: var(--tg-theme-hint-color);
+  margin-bottom: $spacing-md;
+}
+
