@@ -1,0 +1,18 @@
+@import '../variables.scss';
+@import '../mixins.scss';
+
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--tg-theme-bg-color);
+  color: var(--tg-theme-text-color);
+}
+
+.layout-main {
+  flex: 1;
+  padding: var(--spacing);
+  padding-bottom: 80px; // Отступ снизу для навигации
+  @include container;
+}
+

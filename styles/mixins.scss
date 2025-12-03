@@ -1,0 +1,55 @@
+// SCSS миксины для переиспользования стилей
+
+// Центрирование контента
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Вертикальное центрирование
+@mixin flex-center-vertical {
+  display: flex;
+  align-items: center;
+}
+
+// Горизонтальное центрирование
+@mixin flex-center-horizontal {
+  display: flex;
+  justify-content: center;
+}
+
+// Карточка с тенью
+@mixin card {
+  background-color: var(--tg-theme-bg-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: var(--spacing);
+}
+
+// Кнопка в стиле Telegram
+@mixin telegram-button {
+  background-color: var(--tg-theme-button-color);
+  color: var(--tg-theme-button-text-color);
+  border-radius: var(--border-radius);
+  padding: 12px 24px;
+  font-weight: 500;
+  transition: opacity 0.2s;
+  
+  &:hover {
+    opacity: 0.9;
+  }
+  
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+// Адаптивный контейнер
+@mixin container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 var(--spacing);
+}
+

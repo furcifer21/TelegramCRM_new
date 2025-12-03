@@ -1,0 +1,100 @@
+// Глобальные стили для Telegram Mini App
+// Эти стили применяются ко всему приложению
+
+// Импортируем стили компонентов
+@import './components/layout.scss';
+@import './components/navigation.scss';
+@import './components/card.scss';
+@import './components/button.scss';
+@import './components/input.scss';
+@import './components/modal.scss';
+
+// Импортируем стили страниц
+@import './pages/home.scss';
+@import './pages/clients.scss';
+@import './pages/client-form.scss';
+@import './pages/client-detail.scss';
+@import './pages/profile.scss';
+@import './pages/settings.scss';
+
+// Переменные для цветов (можно использовать цвета из Telegram)
+:root {
+  // Основные цвета Telegram
+  --tg-theme-bg-color: #ffffff;
+  --tg-theme-text-color: #000000;
+  --tg-theme-hint-color: #999999;
+  --tg-theme-link-color: #2481cc;
+  --tg-theme-button-color: #2481cc;
+  --tg-theme-button-text-color: #ffffff;
+  --tg-theme-secondary-bg-color: #f1f1f1;
+  
+  // Кастомные переменные
+  --primary-color: #2481cc;
+  --secondary-color: #f1f1f1;
+  --border-color: #e0e0e0;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --border-radius: 12px;
+  --spacing: 16px;
+}
+
+// Сброс стилей и базовые настройки
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  // Используем цвета из Telegram темы
+  background-color: var(--tg-theme-bg-color);
+  color: var(--tg-theme-text-color);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  // Предотвращаем выделение текста (опционально)
+  -webkit-user-select: none;
+  user-select: none;
+  // Убираем скроллбар если не нужен
+  overflow-x: hidden;
+}
+
+// Контейнер приложения
+#__next {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+// Стили для ссылок
+a {
+  color: var(--tg-theme-link-color);
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Стили для кнопок
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Стили для инпутов
+input,
+textarea {
+  font-family: inherit;
+  outline: none;
+}
+

@@ -1,0 +1,21 @@
+{
+  "name": "telegram-crm",
+  "version": "1.0.0",
+  "description": "CRM система для Telegram Mini App - управление клиентами, заметки и напоминания",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^14.0.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "sass": "^1.69.5"
+  }
+}
+

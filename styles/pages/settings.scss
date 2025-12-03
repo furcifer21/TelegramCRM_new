@@ -1,0 +1,141 @@
+@import '../variables.scss';
+@import '../mixins.scss';
+
+.settings {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.settings-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: var(--spacing);
+  text-align: center;
+  color: var(--tg-theme-text-color);
+}
+
+.settings-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: $spacing-md;
+  color: var(--tg-theme-text-color);
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md 0;
+  border-bottom: 1px solid var(--border-color);
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.settings-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  margin-right: $spacing-md;
+}
+
+.settings-label {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--tg-theme-text-color);
+}
+
+.settings-description {
+  font-size: 14px;
+  color: var(--tg-theme-hint-color);
+}
+
+// Toggle switch
+.settings-toggle {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+  flex-shrink: 0;
+  
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    
+    &:checked + .settings-toggle-slider {
+      background-color: var(--tg-theme-button-color);
+      
+      &:before {
+        transform: translateX(22px);
+      }
+    }
+    
+    &:disabled + .settings-toggle-slider {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.settings-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--tg-theme-secondary-bg-color);
+  transition: 0.3s;
+  border-radius: $radius-full;
+  
+  &:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+  }
+}
+
+.settings-select {
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: $radius-sm;
+  font-size: 16px;
+  background-color: var(--tg-theme-bg-color);
+  color: var(--tg-theme-text-color);
+  cursor: pointer;
+  min-width: 150px;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--tg-theme-button-color);
+  }
+}
+
+.settings-actions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+}
+
+.settings-app-info {
+  p {
+    margin-bottom: $spacing-sm;
+    color: var(--tg-theme-text-color);
+    
+    strong {
+      color: var(--tg-theme-hint-color);
+      margin-right: $spacing-xs;
+    }
+  }
+}
+

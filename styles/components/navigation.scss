@@ -1,0 +1,49 @@
+@import '../variables.scss';
+@import '../mixins.scss';
+
+.navigation {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: var(--tg-theme-bg-color);
+  border-top: 1px solid var(--border-color);
+  padding: $spacing-sm $spacing-md;
+  z-index: 1000;
+  // Добавляем безопасную зону для устройств с вырезом
+  padding-bottom: calc($spacing-sm + env(safe-area-inset-bottom));
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xs $spacing-md;
+  text-decoration: none;
+  color: var(--tg-theme-hint-color);
+  transition: color 0.2s;
+  min-width: 60px;
+  
+  &:hover {
+    color: var(--tg-theme-text-color);
+  }
+  
+  &.active {
+    color: var(--tg-theme-button-color);
+  }
+}
+
+.nav-icon {
+  font-size: 24px;
+  margin-bottom: $spacing-xs;
+}
+
+.nav-label {
+  font-size: 12px;
+  font-weight: 500;
+}
+

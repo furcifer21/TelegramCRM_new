@@ -1,0 +1,19 @@
+@import '../variables.scss';
+@import '../mixins.scss';
+
+.card {
+  @include card;
+  margin-bottom: var(--spacing);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-lg;
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
