@@ -93,14 +93,6 @@
   
   &.calendar-day-has-reminders {
     cursor: pointer;
-    
-    &:hover {
-      background-color: var(--tg-theme-secondary-bg-color);
-    }
-    
-    &:active {
-      opacity: 0.8;
-    }
   }
 }
 

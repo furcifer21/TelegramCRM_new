@@ -25,13 +25,8 @@
   padding: $spacing-sm;
   text-decoration: none;
   color: var(--tg-theme-hint-color);
-  transition: color 0.2s;
   min-width: 44px;
   flex: 1;
-  
-  &:hover {
-    color: var(--tg-theme-text-color);
-  }
   
   &.active {
     color: var(--primary-color);

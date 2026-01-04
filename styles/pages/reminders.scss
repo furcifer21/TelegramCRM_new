@@ -151,11 +151,6 @@
   padding: $spacing-xs;
   cursor: pointer;
   color: var(--tg-theme-hint-color);
-  transition: color 0.2s;
-  
-  &:hover {
-    color: $error-color;
-  }
   
   .icon {
     width: 18px;

@@ -75,11 +75,6 @@
   align-items: center;
   justify-content: center;
   border-radius: $radius-sm;
-  transition: background-color 0.2s;
-  
-  &:hover {
-    background-color: var(--tg-theme-secondary-bg-color);
-  }
 }
 
 .modal-body {
