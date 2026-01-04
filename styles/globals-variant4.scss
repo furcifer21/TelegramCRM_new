@@ -1,0 +1,92 @@
+// CSS переменные для варианта 4: Светлая воздушная палитра
+// Используйте этот файл вместо globals.scss для применения варианта 4
+
+:root {
+  // Основные цвета Telegram (используются как fallback)
+  --tg-theme-bg-color: var(--background-color, #ffffff);
+  --tg-theme-text-color: var(--text-color, #475569);
+  --tg-theme-hint-color: var(--hint-color, #cbd5e1);
+  --tg-theme-link-color: var(--primary-color, #3b82f6);
+  --tg-theme-button-color: var(--primary-color, #3b82f6);
+  --tg-theme-button-text-color: #ffffff;
+  --tg-theme-secondary-bg-color: var(--secondary-color, #ffffff);
+  
+  // Кастомные переменные - Светлая воздушная палитра
+  // Primary цвета
+  --primary-color: #3b82f6;
+  --primary-light: #60a5fa;
+  --primary-dark: #2563eb;
+  
+  // Secondary цвета
+  --secondary-color: #ffffff;
+  --secondary-dark: #f8fafc;
+  
+  // Accent цвета
+  --accent-color: #06b6d4;
+  
+  // Текст
+  --text-color: #475569;
+  --text-secondary: #94a3b8;
+  --hint-color: #cbd5e1;
+  
+  // Фоны
+  --background-color: #ffffff;
+  --surface-color: #ffffff;
+  
+  // Границы
+  --border-color: #f1f5f9;
+  
+  // Статусные цвета
+  --error-color: #f87171;
+  --warning-color: #fbbf24;
+  --success-color: #34d399;
+  --info-color: #60a5fa;
+  
+  // Другие переменные
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --border-radius: 8px;
+  --spacing: 16px;
+}
+
+// Темная тема
+@media (prefers-color-scheme: dark) {
+  :root {
+    --tg-theme-bg-color: #0f172a;
+    --tg-theme-text-color: #f1f5f9;
+    --tg-theme-hint-color: #64748b;
+    --tg-theme-link-color: #60a5fa;
+    --tg-theme-button-color: #3b82f6;
+    --tg-theme-button-text-color: #ffffff;
+    --tg-theme-secondary-bg-color: #1e293b;
+    
+    --primary-color: #60a5fa;
+    --primary-light: #93c5fd;
+    --primary-dark: #3b82f6;
+    
+    --secondary-color: #1e293b;
+    --secondary-dark: #334155;
+    
+    --accent-color: #22d3ee;
+    
+    --text-color: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --hint-color: #94a3b8;
+    
+    --background-color: #0f172a;
+    --surface-color: #1e293b;
+    
+    --border-color: #334155;
+    
+    --error-color: #fca5a5;
+    --warning-color: #fcd34d;
+    --success-color: #6ee7b7;
+    --info-color: #93c5fd;
+    
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+}
+

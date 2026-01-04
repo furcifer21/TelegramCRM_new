@@ -34,7 +34,11 @@
   }
   
   &.active {
-    color: var(--tg-theme-button-color);
+    color: var(--primary-color);
+    
+    .nav-icon {
+      stroke-width: 2.5;
+    }
   }
   
   &.nav-item-center {

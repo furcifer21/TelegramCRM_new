@@ -5,15 +5,19 @@
   @include card;
   margin-bottom: var(--spacing);
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.2s ease;
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: $shadow-lg;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+    border-color: var(--primary-color);
   }
   
   &:active {
     transform: translateY(0);
+    box-shadow: var(--shadow);
   }
 }
 
