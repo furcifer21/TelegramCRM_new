@@ -4,11 +4,12 @@
  * Демонстрирует:
  * - Настройки приложения
  * - Использование переключателей и других UI элементов
- * - Сохранение настроек (можно использовать CloudStorage от Telegram)
+ * - Сохранение настроек в Supabase
  */
 
 import { useState, useEffect } from 'react';
 import { getTelegramWebApp } from '../lib/telegram';
+import { apiGet, apiPost } from '../lib/api';
 import Card from '../components/Card';
 import Button from '../components/Button';
 
@@ -20,6 +21,8 @@ export default function Settings() {
   const [sound, setSound] = useState(true);
   const [language, setLanguage] = useState('ru');
   const [theme, setTheme] = useState('auto');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   
   // Загружаем настройки при монтировании
   useEffect(() => {
@@ -27,80 +30,59 @@ export default function Settings() {
   }, []);
   
   /**
-   * Загружает настройки из CloudStorage Telegram (если доступно)
-   * или из localStorage
+   * Загружает настройки из API
    */
-  const loadSettings = () => {
-    if (webApp?.CloudStorage) {
-      // Используем CloudStorage Telegram для синхронизации между устройствами
-      webApp.CloudStorage.getItem('notifications', (error, value) => {
-        if (!error && value !== null) {
-          setNotifications(value === 'true');
-        }
-      });
-      
-      webApp.CloudStorage.getItem('sound', (error, value) => {
-        if (!error && value !== null) {
-          setSound(value === 'true');
-        }
-      });
-      
-      webApp.CloudStorage.getItem('language', (error, value) => {
-        if (!error && value !== null) {
-          setLanguage(value);
-        }
-      });
-      
-      webApp.CloudStorage.getItem('theme', (error, value) => {
-        if (!error && value !== null && (value === 'light' || value === 'dark' || value === 'auto')) {
-          setTheme(value);
-        }
-      });
-    } else {
-      // Fallback на localStorage
-      const savedNotifications = localStorage.getItem('notifications');
-      const savedSound = localStorage.getItem('sound');
-      const savedLanguage = localStorage.getItem('language');
-      const savedTheme = localStorage.getItem('theme');
-      
-      if (savedNotifications !== null) {
-        setNotifications(savedNotifications === 'true');
+  const loadSettings = async () => {
+    setLoading(true);
+    try {
+      const response = await apiGet('/api/settings');
+      if (response.success && response.data) {
+        setNotifications(response.data.notifications !== false);
+        setSound(response.data.sound !== false);
+        setLanguage(response.data.language || 'ru');
+        setTheme(response.data.theme || 'auto');
       }
-      if (savedSound !== null) {
-        setSound(savedSound === 'true');
-      }
-      if (savedLanguage) {
-        setLanguage(savedLanguage);
-      }
-      if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark' || savedTheme === 'auto')) {
-        setTheme(savedTheme);
-      }
+    } catch (error) {
+      console.error('Error loading settings:', error);
+    } finally {
+      setLoading(false);
     }
   };
   
   /**
-   * Сохраняет настройки в CloudStorage или localStorage
+   * Сохраняет настройки через API
    */
-  const saveSettings = () => {
-    if (webApp?.CloudStorage) {
-      // Сохраняем в CloudStorage Telegram
-      webApp.CloudStorage.setItem('notifications', notifications.toString());
-      webApp.CloudStorage.setItem('sound', sound.toString());
-      webApp.CloudStorage.setItem('language', language);
-      webApp.CloudStorage.setItem('theme', theme);
+  const saveSettings = async () => {
+    setSaving(true);
+    try {
+      const response = await apiPost('/api/settings', {
+        notifications,
+        sound,
+        language,
+        theme,
+      });
       
-      if (webApp.HapticFeedback) {
-        webApp.HapticFeedback.notificationOccurred('success');
+      if (response.success) {
+        if (webApp?.HapticFeedback) {
+          webApp.HapticFeedback.notificationOccurred('success');
+        }
+        if (webApp) {
+          webApp.showAlert('Настройки сохранены!');
+        } else {
+          alert('Настройки сохранены!');
+        }
+      } else {
+        throw new Error(response.error || 'Ошибка сохранения');
       }
-      webApp.showAlert('Настройки сохранены!');
-    } else {
-      // Fallback на localStorage
-      localStorage.setItem('notifications', notifications.toString());
-      localStorage.setItem('sound', sound.toString());
-      localStorage.setItem('language', language);
-      localStorage.setItem('theme', theme);
-      
-      alert('Настройки сохранены!');
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      if (webApp) {
+        webApp.showAlert('Ошибка при сохранении настроек');
+      } else {
+        alert('Ошибка при сохранении настроек');
+      }
+    } finally {
+      setSaving(false);
     }
   };
   
@@ -109,13 +91,13 @@ export default function Settings() {
    */
   const resetSettings = () => {
     if (webApp) {
-      webApp.showConfirm('Вы уверены, что хотите сбросить настройки?', (confirmed) => {
+      webApp.showConfirm('Вы уверены, что хотите сбросить настройки?', async (confirmed) => {
         if (confirmed) {
           setNotifications(true);
           setSound(true);
           setLanguage('ru');
           setTheme('auto');
-          saveSettings();
+          await saveSettings();
         }
       });
     } else {
@@ -221,10 +203,10 @@ export default function Settings() {
       
       {/* Кнопки действий */}
       <div className="settings-actions">
-        <Button onClick={saveSettings}>
-          Сохранить настройки
+        <Button onClick={saveSettings} disabled={loading || saving}>
+          {saving ? 'Сохранение...' : 'Сохранить настройки'}
         </Button>
-        <Button onClick={resetSettings} variant="secondary">
+        <Button onClick={resetSettings} variant="secondary" disabled={loading || saving}>
           Сбросить настройки
         </Button>
       </div>

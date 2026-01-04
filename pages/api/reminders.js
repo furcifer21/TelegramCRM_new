@@ -1,0 +1,76 @@
+/**
+ * API endpoint для работы с напоминаниями
+ * 
+ * GET /api/reminders - получить все напоминания (опционально фильтр по client_id, archived)
+ * POST /api/reminders - создать напоминание
+ * PUT /api/reminders/[id] - обновить напоминание
+ * DELETE /api/reminders/[id] - удалить напоминание
+ */
+
+import { createSupabaseClient } from '../../lib/supabase';
+
+export default async function handler(req, res) {
+  const { method } = req;
+
+  try {
+    const supabase = createSupabaseClient();
+    switch (method) {
+      case 'GET': {
+        const { client_id, archived } = req.query;
+        
+        let query = supabase.from('reminders').select('*');
+        
+        if (client_id) {
+          query = query.eq('client_id', client_id);
+        }
+        
+        if (archived !== undefined) {
+          query = query.eq('archived', archived === 'true');
+        }
+        
+        const { data, error } = await query.order('date', { ascending: true }).order('time', { ascending: true });
+        
+        if (error) throw error;
+        return res.status(200).json(data || []);
+      }
+      
+      case 'POST': {
+        const { client_id, text, date, time } = req.body;
+        
+        if (!text || !text.trim()) {
+          return res.status(400).json({ error: 'Текст напоминания обязателен' });
+        }
+        
+        if (!date) {
+          return res.status(400).json({ error: 'Дата обязательна' });
+        }
+        
+        const { data, error } = await supabase
+          .from('reminders')
+          .insert([
+            {
+              client_id: client_id || null,
+              text: text.trim(),
+              date: date,
+              time: time || '09:00',
+              notified: false,
+              archived: false,
+            }
+          ])
+          .select()
+          .single();
+        
+        if (error) throw error;
+        return res.status(201).json(data);
+      }
+      
+      default:
+        res.setHeader('Allow', ['GET', 'POST']);
+        return res.status(405).json({ error: `Method ${method} not allowed` });
+    }
+  } catch (error) {
+    console.error('API error:', error);
+    return res.status(500).json({ error: error.message || 'Internal server error' });
+  }
+}
+
