@@ -10,6 +10,7 @@
 import { useState, useEffect } from 'react';
 import { getTelegramUser, getTelegramWebApp } from '../lib/telegram';
 import { apiGet, apiPost } from '../lib/api';
+import { useLoader } from '../contexts/LoaderContext';
 import Card from '../components/Card';
 import Button from '../components/Button';
 
@@ -17,6 +18,7 @@ export default function Profile() {
   // Получаем данные пользователя из Telegram
   const telegramUser = getTelegramUser();
   const webApp = getTelegramWebApp();
+  const { setLoading: setGlobalLoading } = useLoader();
   
   // Состояние для данных профиля
   const [profile, setProfile] = useState({
@@ -41,6 +43,7 @@ export default function Profile() {
    */
   const loadProfile = async () => {
     setLoading(true);
+    setGlobalLoading(true);
     
     // Пример запроса к API для получения профиля
     // const response = await apiGet('/users/profile');
@@ -67,6 +70,7 @@ export default function Profile() {
         });
       }
       setLoading(false);
+      setGlobalLoading(false);
     }, 500);
   };
   
@@ -124,11 +128,7 @@ export default function Profile() {
     <div className="profile">
       <h1 className="profile-title">Профиль</h1>
       
-      {loading ? (
-        <Card>
-          <p className="profile-loading">Загрузка профиля...</p>
-        </Card>
-      ) : (
+      {!loading && (
         <>
           {/* Форма редактирования профиля */}
           <Card>

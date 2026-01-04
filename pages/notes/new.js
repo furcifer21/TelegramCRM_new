@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { getClients, createNote } from '../../lib/crm';
 import { getTelegramWebApp } from '../../lib/telegram';
+import { useLoader } from '../../contexts/LoaderContext';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Textarea from '../../components/Textarea';
@@ -17,6 +18,7 @@ export default function NewNote() {
   const router = useRouter();
   const { clientId } = router.query; // Опциональный параметр из URL
   const webApp = getTelegramWebApp();
+  const { setLoading: setGlobalLoading } = useLoader();
   
   const [clients, setClients] = useState([]);
   const [formData, setFormData] = useState({
@@ -37,6 +39,7 @@ export default function NewNote() {
    */
   const loadClients = async () => {
     setLoading(true);
+    setGlobalLoading(true);
     try {
       const clientsList = await getClients();
       setClients(clientsList);
@@ -44,6 +47,7 @@ export default function NewNote() {
       console.error('Error loading clients:', error);
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   };
   
@@ -124,34 +128,34 @@ export default function NewNote() {
       
       <form onSubmit={handleSubmit} className="note-form">
         <Card>
-          {loading ? (
-            <p>Загрузка клиентов...</p>
-          ) : (
-            <div className="input-group">
-              <label className="input-label">Клиент (необязательно)</label>
-              <select
-                value={formData.clientId}
-                onChange={(e) => handleChange('clientId', e.target.value)}
-                className="input-field"
-              >
-                <option value="">Без привязки к клиенту</option>
-                {clients.map((client) => (
-                  <option key={client.id} value={client.id}>
-                    {client.name || 'Без имени'}
-                  </option>
-                ))}
-              </select>
-            </div>
+          {!loading && (
+            <>
+              <div className="input-group">
+                <label className="input-label">Клиент (необязательно)</label>
+                <select
+                  value={formData.clientId}
+                  onChange={(e) => handleChange('clientId', e.target.value)}
+                  className="input-field"
+                >
+                  <option value="">Без привязки к клиенту</option>
+                  {clients.map((client) => (
+                    <option key={client.id} value={client.id}>
+                      {client.name || 'Без имени'}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <Textarea
+                label="Текст заметки *"
+                value={formData.text}
+                onChange={(e) => handleChange('text', e.target.value)}
+                placeholder="Введите текст заметки..."
+                required
+                rows={8}
+              />
+            </>
           )}
-          
-          <Textarea
-            label="Текст заметки *"
-            value={formData.text}
-            onChange={(e) => handleChange('text', e.target.value)}
-            placeholder="Введите текст заметки..."
-            required
-            rows={8}
-          />
         </Card>
         
         <div className="form-actions">

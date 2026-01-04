@@ -175,17 +175,7 @@ export default function NoteDetail() {
     });
   };
   
-  if (loading) {
-    return (
-      <div className="note-detail-page">
-        <Card>
-          <p>Загрузка...</p>
-        </Card>
-      </div>
-    );
-  }
-  
-  if (!note) {
+  if (!note && !loading) {
     return null;
   }
   

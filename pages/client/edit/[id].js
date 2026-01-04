@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { getClient, updateClient } from '../../../lib/crm';
 import { getTelegramWebApp } from '../../../lib/telegram';
+import { useLoader } from '../../../contexts/LoaderContext';
 import { unformatPhone, formatPhone, PHONE_FORMATS } from '../../../lib/phoneMask';
 import Card from '../../../components/Card';
 import Button from '../../../components/Button';
@@ -18,6 +19,7 @@ export default function EditClient() {
   const router = useRouter();
   const { id } = router.query;
   const webApp = getTelegramWebApp();
+  const { setLoading: setGlobalLoading } = useLoader();
   
   const [formData, setFormData] = useState({
     name: '',
@@ -44,6 +46,7 @@ export default function EditClient() {
    */
   const loadClient = async () => {
     setLoading(true);
+    setGlobalLoading(true);
     try {
       const client = await getClient(id);
       if (!client) {
@@ -69,6 +72,7 @@ export default function EditClient() {
       router.push('/clients');
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   };
   
@@ -153,16 +157,6 @@ export default function EditClient() {
   const handleCancel = () => {
     router.back();
   };
-  
-  if (loading) {
-    return (
-      <div className="client-form-page">
-        <Card>
-          <p>Загрузка...</p>
-        </Card>
-      </div>
-    );
-  }
   
   return (
     <div className="client-form-page">

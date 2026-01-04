@@ -182,17 +182,7 @@ export default function ReminderDetail() {
     });
   };
   
-  if (loading) {
-    return (
-      <div className="reminder-detail-page">
-        <Card>
-          <p>Загрузка...</p>
-        </Card>
-      </div>
-    );
-  }
-  
-  if (!reminder) {
+  if (!reminder && !loading) {
     return null;
   }
   
