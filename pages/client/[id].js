@@ -322,16 +322,18 @@ export default function ClientDetail() {
           <Button
             variant="secondary"
             onClick={() => router.push(`/client/edit/${id}`)}
+            className="icon-button"
+            title="Редактировать"
           >
             <EditIcon className="icon" />
-            Редактировать
           </Button>
           <Button
             variant="secondary"
             onClick={handleDelete}
+            className="icon-button"
+            title="Удалить"
           >
             <TrashIcon className="icon" />
-            Удалить
           </Button>
         </div>
       </Card>
@@ -354,7 +356,12 @@ export default function ClientDetail() {
         ) : (
           <div className="notes-list">
             {notes.map((note) => (
-              <div key={note.id} className="note-item">
+              <div 
+                key={note.id} 
+                className="note-item"
+                onClick={() => router.push(`/note/${note.id}`)}
+                style={{ cursor: 'pointer' }}
+              >
                 <p className="note-text">{note.text}</p>
                 <div className="note-footer">
                   <span className="note-date">
@@ -362,7 +369,10 @@ export default function ClientDetail() {
                   </span>
                   <Button
                     variant="secondary"
-                    onClick={() => handleDeleteNote(note.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteNote(note.id);
+                    }}
                     className="note-delete-button"
                   >
                     <TrashIcon className="icon" />
@@ -399,6 +409,8 @@ export default function ClientDetail() {
                 <div
                   key={reminder.id}
                   className={`reminder-item ${isPast && !reminder.notified ? 'reminder-past' : ''}`}
+                  onClick={() => router.push(`/reminder/${reminder.id}`)}
+                  style={{ cursor: 'pointer' }}
                 >
                   <div className="reminder-content">
                     <p className="reminder-text">{reminder.text}</p>
@@ -414,7 +426,10 @@ export default function ClientDetail() {
                   </div>
                   <Button
                     variant="secondary"
-                    onClick={() => handleDeleteReminder(reminder.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteReminder(reminder.id);
+                    }}
                     className="reminder-delete-button"
                   >
                     <TrashIcon className="icon" />

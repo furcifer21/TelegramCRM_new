@@ -26,6 +26,55 @@ export default async function handler(req, res) {
     const supabase = createSupabaseClient();
     
     switch (method) {
+      case 'GET': {
+        const { data, error } = await supabase
+          .from('notes')
+          .select('*')
+          .eq('id', id)
+          .eq('user_id', userId)
+          .single();
+        
+        if (error) throw error;
+        if (!data) {
+          return res.status(404).json({ error: 'Заметка не найдена' });
+        }
+        return res.status(200).json(data);
+      }
+      
+      case 'PUT': {
+        // Проверяем, что заметка принадлежит пользователю
+        const { data: existingNote } = await supabase
+          .from('notes')
+          .select('id')
+          .eq('id', id)
+          .eq('user_id', userId)
+          .single();
+        
+        if (!existingNote) {
+          return res.status(404).json({ error: 'Заметка не найдена или не принадлежит вам' });
+        }
+        
+        const updateData = {};
+        const { text, client_id } = req.body;
+        
+        if (text !== undefined) updateData.text = text.trim();
+        if (client_id !== undefined) updateData.client_id = client_id || null;
+        
+        const { data, error } = await supabase
+          .from('notes')
+          .update(updateData)
+          .eq('id', id)
+          .eq('user_id', userId)
+          .select()
+          .single();
+        
+        if (error) throw error;
+        if (!data) {
+          return res.status(404).json({ error: 'Заметка не найдена' });
+        }
+        return res.status(200).json(data);
+      }
+      
       case 'DELETE': {
         // Проверяем, что заметка принадлежит пользователю
         const { data: existingNote } = await supabase
@@ -50,7 +99,7 @@ export default async function handler(req, res) {
       }
       
       default:
-        res.setHeader('Allow', ['DELETE']);
+        res.setHeader('Allow', ['GET', 'PUT', 'DELETE']);
         return res.status(405).json({ error: `Method ${method} not allowed` });
     }
   } catch (error) {

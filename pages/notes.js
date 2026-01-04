@@ -185,7 +185,12 @@ export default function Notes() {
       ) : (
         <div className="notes-list">
           {filteredNotes.map((note) => (
-            <Card key={note.id} className="note-card">
+            <Card 
+              key={note.id} 
+              className="note-card"
+              onClick={() => router.push(`/note/${note.id}`)}
+              style={{ cursor: 'pointer' }}
+            >
               <div className="note-header">
                 <div className="note-info">
                   <FileTextIcon className="note-icon" />
@@ -195,7 +200,10 @@ export default function Notes() {
                   </div>
                 </div>
                 <button
-                  onClick={() => handleDelete(note.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(note.id);
+                  }}
                   className="delete-button"
                   aria-label="Удалить"
                 >

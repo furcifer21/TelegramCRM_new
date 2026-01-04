@@ -27,6 +27,21 @@ export default async function handler(req, res) {
     const supabase = createSupabaseClient();
     
     switch (method) {
+      case 'GET': {
+        const { data, error } = await supabase
+          .from('reminders')
+          .select('*')
+          .eq('id', id)
+          .eq('user_id', userId)
+          .single();
+        
+        if (error) throw error;
+        if (!data) {
+          return res.status(404).json({ error: 'Напоминание не найдено' });
+        }
+        return res.status(200).json(data);
+      }
+      
       case 'PUT': {
         // Проверяем, что напоминание принадлежит пользователю
         const { data: existingReminder } = await supabase
@@ -93,7 +108,7 @@ export default async function handler(req, res) {
       }
       
       default:
-        res.setHeader('Allow', ['PUT', 'DELETE']);
+        res.setHeader('Allow', ['GET', 'PUT', 'DELETE']);
         return res.status(405).json({ error: `Method ${method} not allowed` });
     }
   } catch (error) {

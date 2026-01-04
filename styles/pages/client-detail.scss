@@ -51,9 +51,12 @@
   margin-top: $spacing-md;
   padding-top: $spacing-md;
   border-top: 1px solid var(--border-color);
+  justify-content: flex-end;
   
-  .button {
-    flex: 1;
+  .icon-button {
+    min-width: auto;
+    padding: $spacing-sm;
+    flex: 0 0 auto;
   }
 }
 
@@ -107,6 +110,13 @@
   color: var(--tg-theme-text-color);
   margin: 0 0 $spacing-xs 0;
   flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+  max-height: 2.8em;
 }
 
 .note-footer {

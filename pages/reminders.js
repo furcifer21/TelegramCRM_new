@@ -216,7 +216,12 @@ export default function Reminders() {
             const isOverdue = reminderDate < new Date();
             
             return (
-              <Card key={reminder.id} className={isOverdue ? 'reminder-card overdue' : 'reminder-card'}>
+              <Card 
+                key={reminder.id} 
+                className={isOverdue ? 'reminder-card overdue' : 'reminder-card'}
+                onClick={() => router.push(`/reminder/${reminder.id}`)}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="reminder-header">
                   <div className="reminder-info">
                     <ClockIcon className="reminder-icon" />
@@ -230,7 +235,10 @@ export default function Reminders() {
                     </div>
                   </div>
                   <button
-                    onClick={() => handleDelete(reminder.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(reminder.id);
+                    }}
                     className="delete-button"
                     aria-label="Удалить"
                   >
