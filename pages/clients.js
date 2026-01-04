@@ -123,7 +123,6 @@ export default function Clients() {
           placeholder="Поиск по имени, телефону, email..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="search-input"
         />
       </div>
       
