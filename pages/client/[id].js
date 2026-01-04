@@ -61,19 +61,45 @@ export default function ClientDetail() {
       
       setClient(clientData);
       
-      // Загружаем заметки
-      const clientNotes = await getClientNotes(id);
-      clientNotes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      setNotes(clientNotes);
+      // Загружаем заметки (может быть пустой массив, это нормально)
+      try {
+        const clientNotes = await getClientNotes(id);
+        if (Array.isArray(clientNotes)) {
+          clientNotes.sort((a, b) => {
+            const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+            const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+            return dateB - dateA;
+          });
+          setNotes(clientNotes);
+        } else {
+          setNotes([]);
+        }
+      } catch (error) {
+        console.error('Error loading notes:', error);
+        setNotes([]); // Устанавливаем пустой массив при ошибке
+      }
       
-      // Загружаем напоминания
-      const clientReminders = await getClientReminders(id);
-      clientReminders.sort((a, b) => {
-        const dateA = new Date(`${a.date}T${a.time}`);
-        const dateB = new Date(`${b.date}T${b.time}`);
-        return dateA - dateB;
-      });
-      setReminders(clientReminders);
+      // Загружаем напоминания (может быть пустой массив, это нормально)
+      try {
+        const clientReminders = await getClientReminders(id);
+        if (Array.isArray(clientReminders)) {
+          clientReminders.sort((a, b) => {
+            try {
+              const dateA = new Date(`${a.date}T${a.time}`);
+              const dateB = new Date(`${b.date}T${b.time}`);
+              return dateA - dateB;
+            } catch (e) {
+              return 0;
+            }
+          });
+          setReminders(clientReminders);
+        } else {
+          setReminders([]);
+        }
+      } catch (error) {
+        console.error('Error loading reminders:', error);
+        setReminders([]); // Устанавливаем пустой массив при ошибке
+      }
     } catch (error) {
       console.error('Error loading client data:', error);
       if (webApp) {
