@@ -1,0 +1,141 @@
+@import '../variables.scss';
+@import '../mixins.scss';
+
+.calendar-page {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+}
+
+.calendar-nav-button {
+  min-width: 40px;
+  padding: $spacing-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  .icon {
+    width: 20px;
+    height: 20px;
+    
+    &.icon-flipped {
+      transform: scaleX(-1);
+    }
+  }
+}
+
+.calendar-month-year {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.calendar-month-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--tg-theme-text-color);
+  text-transform: capitalize;
+}
+
+.calendar-today-button {
+  font-size: 12px;
+  padding: 4px 12px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: $spacing-xs;
+  margin-top: $spacing-md;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tg-theme-hint-color);
+  padding: $spacing-xs 0;
+  text-transform: uppercase;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: $spacing-xs;
+  border-radius: $radius-sm;
+  position: relative;
+  cursor: default;
+  
+  &.calendar-day-empty {
+    visibility: hidden;
+  }
+  
+  &.calendar-day-today {
+    background-color: var(--tg-theme-button-color);
+    color: var(--tg-theme-button-text-color);
+    
+    .calendar-day-number {
+      color: var(--tg-theme-button-text-color);
+      font-weight: 700;
+    }
+  }
+  
+  &.calendar-day-has-reminders {
+    cursor: pointer;
+    
+    &:hover {
+      background-color: var(--tg-theme-secondary-bg-color);
+    }
+    
+    &:active {
+      opacity: 0.8;
+    }
+  }
+}
+
+.calendar-day-number {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--tg-theme-text-color);
+  margin-bottom: 2px;
+}
+
+.calendar-day-reminder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  gap: 2px;
+}
+
+.calendar-reminder-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--tg-theme-button-color);
+  
+  .calendar-day-today & {
+    color: var(--tg-theme-button-text-color);
+  }
+}
+
+.calendar-reminder-count {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--tg-theme-button-color);
+  
+  .calendar-day-today & {
+    color: var(--tg-theme-button-text-color);
+  }
+}
+
