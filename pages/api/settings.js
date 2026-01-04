@@ -12,8 +12,13 @@ export default async function handler(req, res) {
   const { method } = req;
 
   try {
-    // Получаем user_id из запроса
-    const userId = getUserIdFromRequest(req);
+    // Получаем user_id из запроса (из query параметров для GET или из body/header для POST)
+    let userId = getUserIdFromRequest(req);
+    
+    // Для GET запросов также проверяем query параметры
+    if (!userId && method === 'GET') {
+      userId = req.query.user_id || null;
+    }
     
     if (!userId) {
       return res.status(401).json({ error: 'User ID не найден. Приложение должно быть запущено в Telegram.' });
