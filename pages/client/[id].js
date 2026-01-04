@@ -58,15 +58,24 @@ export default function ClientDetail() {
    * Загружает данные клиента, заметки и напоминания
    */
   const loadData = async () => {
+    if (!id) {
+      return;
+    }
+    
     setLoading(true);
     setGlobalLoading(true);
     try {
       const clientData = await getClient(id);
       if (!clientData) {
+        setLoading(false);
+        setGlobalLoading(false);
         if (webApp) {
           webApp.showAlert('Клиент не найден');
         }
-        router.push('/clients');
+        // Используем setTimeout для безопасного редиректа
+        setTimeout(() => {
+          router.push('/clients');
+        }, 100);
         return;
       }
       
@@ -126,9 +135,11 @@ export default function ClientDetail() {
    * Обработчик удаления клиента
    */
   const handleDelete = () => {
+    if (!client) return;
+    
     if (webApp) {
       webApp.showConfirm(
-        `Вы уверены, что хотите удалить клиента "${client.name}"?`,
+        `Вы уверены, что хотите удалить клиента "${client?.name || 'Без имени'}"?`,
         async (confirmed) => {
           if (confirmed) {
             try {
@@ -145,7 +156,7 @@ export default function ClientDetail() {
         }
       );
     } else {
-      if (confirm(`Удалить клиента "${client.name}"?`)) {
+      if (confirm(`Удалить клиента "${client?.name || 'Без имени'}"?`)) {
         deleteClient(id).then(() => {
           router.push('/clients');
         });
@@ -273,7 +284,13 @@ export default function ClientDetail() {
     }
   };
   
-  if (!client && !loading) {
+  // Показываем loader во время загрузки или если нет id
+  if (loading || !id) {
+    return null;
+  }
+  
+  // Если клиент не найден после загрузки
+  if (!client) {
     return null;
   }
   
@@ -283,19 +300,19 @@ export default function ClientDetail() {
         <Button variant="secondary" onClick={() => router.back()}>
           ← Назад
         </Button>
-        <h1 className="page-title">{client.name || 'Без имени'}</h1>
+        <h1 className="page-title">{client?.name || 'Без имени'}</h1>
       </div>
       
       {/* Информация о клиенте */}
       <Card>
         <div className="client-info">
-          {client.company && (
+          {client?.company && (
             <div className="info-row">
               <span className="info-label">Компания:</span>
               <span className="info-value">{client.company}</span>
             </div>
           )}
-          {client.phone && (
+          {client?.phone && (
             <div className="info-row">
               <span className="info-label">Телефон:</span>
               <a href={`tel:${client.phone}`} className="info-value info-link">
@@ -303,7 +320,7 @@ export default function ClientDetail() {
               </a>
             </div>
           )}
-          {client.email && (
+          {client?.email && (
             <div className="info-row">
               <span className="info-label">Email:</span>
               <a href={`mailto:${client.email}`} className="info-value info-link">
@@ -311,7 +328,7 @@ export default function ClientDetail() {
               </a>
             </div>
           )}
-          {client.notes && (
+          {client?.notes && (
             <div className="info-row">
               <span className="info-label">Заметки:</span>
               <p className="info-value">{client.notes}</p>

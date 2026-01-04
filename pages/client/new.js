@@ -89,13 +89,21 @@ export default function NewClient() {
       };
       const newClient = await createClient(clientData);
       
+      // Проверяем, что клиент создан и имеет id
+      if (!newClient || !newClient.id) {
+        throw new Error('Клиент создан, но ID не получен');
+      }
+      
       // Тактильная обратная связь
       if (webApp?.HapticFeedback) {
         webApp.HapticFeedback.notificationOccurred('success');
       }
       
       // Переходим на страницу клиента
-      router.push(`/client/${newClient.id}`);
+      // Небольшая задержка для стабильности перехода
+      setTimeout(() => {
+        router.push(`/client/${newClient.id}`);
+      }, 100);
     } catch (error) {
       console.error('Error creating client:', error);
       if (webApp) {
