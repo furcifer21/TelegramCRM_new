@@ -6,6 +6,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+
+// Отключаем статическую генерацию для этой страницы
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}
 import { getReminder, updateReminder, deleteReminder, getClients } from '../../lib/crm';
 import { getTelegramWebApp } from '../../lib/telegram';
 import { useLoader } from '../../contexts/LoaderContext';
@@ -182,7 +189,12 @@ export default function ReminderDetail() {
     });
   };
   
-  if (!reminder && !loading) {
+  // Не рендерим контент до загрузки данных или если нет ID
+  if (loading || !id) {
+    return null;
+  }
+  
+  if (!reminder) {
     return null;
   }
   
@@ -223,10 +235,10 @@ export default function ReminderDetail() {
               onClick={() => {
                 setEditing(false);
                 setFormData({
-                  clientId: reminder.clientId || '',
-                  text: reminder.text || '',
-                  date: reminder.date || '',
-                  time: reminder.time || '',
+                  clientId: reminder?.clientId || '',
+                  text: reminder?.text || '',
+                  date: reminder?.date || '',
+                  time: reminder?.time || '',
                 });
               }}
             >
@@ -242,9 +254,11 @@ export default function ReminderDetail() {
             <div className="reminder-detail-meta">
               <div className="reminder-detail-meta-row">
                 <ClockIcon className="reminder-detail-icon" />
-                <span className="reminder-detail-datetime">{formatDateTime(reminder.date, reminder.time)}</span>
+                <span className="reminder-detail-datetime">
+                  {reminder?.date && reminder?.time ? formatDateTime(reminder.date, reminder.time) : ''}
+                </span>
               </div>
-              {reminder.clientId && (
+              {reminder?.clientId && (
                 <div className="reminder-detail-client-row">
                   <span className="reminder-detail-client-label">Клиент:</span>
                   <span className="reminder-detail-client-value">{getClientName(reminder.clientId)}</span>
@@ -253,10 +267,10 @@ export default function ReminderDetail() {
             </div>
             
             <div className="reminder-detail-text-wrapper">
-              <p className="reminder-detail-text">{reminder.text}</p>
+              <p className="reminder-detail-text">{reminder?.text || ''}</p>
             </div>
             
-            {reminder.notified && (
+            {reminder?.notified && (
               <div className="reminder-detail-status">
                 <span className="info-label">Статус:</span>
                 <span className="info-value">Уведомление отправлено</span>

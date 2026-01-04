@@ -6,6 +6,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+
+// Отключаем статическую генерацию для этой страницы
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}
 import { getNote, updateNote, deleteNote, getClients } from '../../lib/crm';
 import { getTelegramWebApp } from '../../lib/telegram';
 import { useLoader } from '../../contexts/LoaderContext';
@@ -175,7 +182,12 @@ export default function NoteDetail() {
     });
   };
   
-  if (!note && !loading) {
+  // Не рендерим контент до загрузки данных или если нет ID
+  if (loading || !id) {
+    return null;
+  }
+  
+  if (!note) {
     return null;
   }
   
@@ -216,8 +228,8 @@ export default function NoteDetail() {
               onClick={() => {
                 setEditing(false);
                 setFormData({
-                  clientId: note.clientId || '',
-                  text: note.text || '',
+                  clientId: note?.clientId || '',
+                  text: note?.text || '',
                 });
               }}
             >
@@ -233,16 +245,18 @@ export default function NoteDetail() {
             <div className="note-detail-meta">
               <div className="note-detail-meta-row">
                 <FileTextIcon className="note-detail-icon" />
-                <span className="note-detail-date">{formatDate(note.createdAt)}</span>
+                <span className="note-detail-date">
+                  {note?.createdAt ? formatDate(note.createdAt) : ''}
+                </span>
               </div>
               <div className="note-detail-client-row">
                 <span className="note-detail-client-label">Клиент:</span>
-                <span className="note-detail-client-value">{getClientName(note.clientId)}</span>
+                <span className="note-detail-client-value">{getClientName(note?.clientId)}</span>
               </div>
             </div>
             
             <div className="note-detail-text-wrapper">
-              <p className="note-detail-text">{note.text}</p>
+              <p className="note-detail-text">{note?.text || ''}</p>
             </div>
           </div>
         </Card>

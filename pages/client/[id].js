@@ -7,6 +7,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+
+// Отключаем статическую генерацию для этой страницы
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}
 import { getClient, deleteClient, getClientNotes, getClientReminders, createNote, deleteNote, createReminder, deleteReminder } from '../../lib/crm';
 import { getTelegramWebApp } from '../../lib/telegram';
 import { useLoader } from '../../contexts/LoaderContext';
