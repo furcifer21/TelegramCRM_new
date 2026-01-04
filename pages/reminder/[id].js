@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { getReminder, updateReminder, deleteReminder, getClients } from '../../lib/crm';
 import { getTelegramWebApp } from '../../lib/telegram';
+import { useLoader } from '../../contexts/LoaderContext';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
@@ -18,6 +19,7 @@ export default function ReminderDetail() {
   const router = useRouter();
   const { id } = router.query;
   const webApp = getTelegramWebApp();
+  const { setLoading: setGlobalLoading } = useLoader();
   
   const [reminder, setReminder] = useState(null);
   const [clients, setClients] = useState([]);
@@ -43,6 +45,7 @@ export default function ReminderDetail() {
    */
   const loadData = async () => {
     setLoading(true);
+    setGlobalLoading(true);
     try {
       const [reminderData, clientsData] = await Promise.all([
         getReminder(id),
@@ -72,6 +75,7 @@ export default function ReminderDetail() {
       }
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   };
   
@@ -97,6 +101,7 @@ export default function ReminderDetail() {
     }
     
     setSaving(true);
+    setGlobalLoading(true);
     try {
       await updateReminder(id, {
         clientId: formData.clientId || null,
@@ -118,6 +123,7 @@ export default function ReminderDetail() {
       }
     } finally {
       setSaving(false);
+      setGlobalLoading(false);
     }
   };
   
@@ -243,31 +249,29 @@ export default function ReminderDetail() {
       {!editing ? (
         <Card>
           <div className="reminder-detail-content">
-            <div className="reminder-detail-header">
-              <ClockIcon className="reminder-detail-icon" />
-              <div>
-                <h2 className="reminder-detail-text">{reminder.text}</h2>
-                {reminder.clientId && (
-                  <p className="reminder-detail-client">
-                    Клиент: {getClientName(reminder.clientId)}
-                  </p>
-                )}
+            <div className="reminder-detail-meta">
+              <div className="reminder-detail-meta-row">
+                <ClockIcon className="reminder-detail-icon" />
+                <span className="reminder-detail-datetime">{formatDateTime(reminder.date, reminder.time)}</span>
               </div>
-            </div>
-            
-            <div className="reminder-detail-info">
-              <div className="info-row">
-                <span className="info-label">Дата и время</span>
-                <span className="info-value">{formatDateTime(reminder.date, reminder.time)}</span>
-              </div>
-              
-              {reminder.notified && (
-                <div className="info-row">
-                  <span className="info-label">Статус</span>
-                  <span className="info-value">Уведомление отправлено</span>
+              {reminder.clientId && (
+                <div className="reminder-detail-client-row">
+                  <span className="reminder-detail-client-label">Клиент:</span>
+                  <span className="reminder-detail-client-value">{getClientName(reminder.clientId)}</span>
                 </div>
               )}
             </div>
+            
+            <div className="reminder-detail-text-wrapper">
+              <p className="reminder-detail-text">{reminder.text}</p>
+            </div>
+            
+            {reminder.notified && (
+              <div className="reminder-detail-status">
+                <span className="info-label">Статус:</span>
+                <span className="info-value">Уведомление отправлено</span>
+              </div>
+            )}
           </div>
         </Card>
       ) : (

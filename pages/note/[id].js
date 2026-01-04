@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { getNote, updateNote, deleteNote, getClients } from '../../lib/crm';
 import { getTelegramWebApp } from '../../lib/telegram';
+import { useLoader } from '../../contexts/LoaderContext';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Textarea from '../../components/Textarea';
@@ -17,6 +18,7 @@ export default function NoteDetail() {
   const router = useRouter();
   const { id } = router.query;
   const webApp = getTelegramWebApp();
+  const { setLoading: setGlobalLoading } = useLoader();
   
   const [note, setNote] = useState(null);
   const [clients, setClients] = useState([]);
@@ -40,6 +42,7 @@ export default function NoteDetail() {
    */
   const loadData = async () => {
     setLoading(true);
+    setGlobalLoading(true);
     try {
       const [noteData, clientsData] = await Promise.all([
         getNote(id),
@@ -67,6 +70,7 @@ export default function NoteDetail() {
       }
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   };
   
@@ -92,6 +96,7 @@ export default function NoteDetail() {
     }
     
     setSaving(true);
+    setGlobalLoading(true);
     try {
       await updateNote(id, {
         clientId: formData.clientId || null,
@@ -111,6 +116,7 @@ export default function NoteDetail() {
       }
     } finally {
       setSaving(false);
+      setGlobalLoading(false);
     }
   };
   
@@ -234,19 +240,19 @@ export default function NoteDetail() {
       {!editing ? (
         <Card>
           <div className="note-detail-content">
-            <div className="note-detail-header">
-              <FileTextIcon className="note-detail-icon" />
-              <div>
-                <p className="note-detail-text">{note.text}</p>
-                <p className="note-detail-client">{getClientName(note.clientId)}</p>
+            <div className="note-detail-meta">
+              <div className="note-detail-meta-row">
+                <FileTextIcon className="note-detail-icon" />
+                <span className="note-detail-date">{formatDate(note.createdAt)}</span>
+              </div>
+              <div className="note-detail-client-row">
+                <span className="note-detail-client-label">Клиент:</span>
+                <span className="note-detail-client-value">{getClientName(note.clientId)}</span>
               </div>
             </div>
             
-            <div className="note-detail-info">
-              <div className="info-row">
-                <span className="info-label">Создано</span>
-                <span className="info-value">{formatDate(note.createdAt)}</span>
-              </div>
+            <div className="note-detail-text-wrapper">
+              <p className="note-detail-text">{note.text}</p>
             </div>
           </div>
         </Card>

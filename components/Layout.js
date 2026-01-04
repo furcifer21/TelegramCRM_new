@@ -7,14 +7,42 @@
  * - Инициализацию Telegram WebApp
  */
 
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { initTelegramWebApp, getTelegramWebApp } from '../lib/telegram';
 import { getActiveReminders, markReminderAsNotified } from '../lib/crm';
 import Navigation from './Navigation';
+import Loader from './Loader';
+import { LoaderProvider, useLoader } from '../contexts/LoaderContext';
 
-export default function Layout({ children }) {
+function LayoutContent({ children }) {
   const router = useRouter();
+  const { setLoading } = useLoader();
+  
+  // Управление лоадером при переходах между страницами
+  useEffect(() => {
+    const handleRouteChangeStart = () => {
+      setLoading(true);
+    };
+    
+    const handleRouteChangeComplete = () => {
+      setLoading(false);
+    };
+    
+    const handleRouteChangeError = () => {
+      setLoading(false);
+    };
+    
+    router.events.on('routeChangeStart', handleRouteChangeStart);
+    router.events.on('routeChangeComplete', handleRouteChangeComplete);
+    router.events.on('routeChangeError', handleRouteChangeError);
+    
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChangeStart);
+      router.events.off('routeChangeComplete', handleRouteChangeComplete);
+      router.events.off('routeChangeError', handleRouteChangeError);
+    };
+  }, [router, setLoading]);
   
   // Инициализируем Telegram WebApp при загрузке компонента
   useEffect(() => {
@@ -84,8 +112,13 @@ export default function Layout({ children }) {
     };
   }, []);
   
+  const { loading } = useLoader();
+  
   return (
     <div className="layout">
+      {/* Лоадер */}
+      <Loader show={loading} />
+      
       {/* Основной контент страницы */}
       <main className="layout-main">
         {children}
@@ -94,6 +127,14 @@ export default function Layout({ children }) {
       {/* Навигация внизу экрана */}
       <Navigation currentPath={router.pathname} />
     </div>
+  );
+}
+
+export default function Layout({ children }) {
+  return (
+    <LoaderProvider>
+      <LayoutContent>{children}</LayoutContent>
+    </LoaderProvider>
   );
 }
 

@@ -11,39 +11,74 @@
   padding: $spacing-sm 0;
 }
 
-.reminder-detail-header {
-  display: flex;
-  align-items: flex-start;
-  gap: $spacing-md;
+.reminder-detail-meta {
   margin-bottom: $spacing-lg;
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.reminder-detail-meta-row {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .reminder-detail-icon {
-  width: 32px;
-  height: 32px;
+  width: 20px;
+  height: 20px;
   color: var(--tg-theme-button-color);
   flex-shrink: 0;
-  margin-top: 4px;
+}
+
+.reminder-detail-datetime {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--tg-theme-text-color);
+}
+
+.reminder-detail-client-row {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  margin-top: $spacing-sm;
+}
+
+.reminder-detail-client-label {
+  font-size: 14px;
+  color: var(--tg-theme-hint-color);
+}
+
+.reminder-detail-client-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--tg-theme-text-color);
+}
+
+.reminder-detail-text-wrapper {
+  margin-top: $spacing-md;
 }
 
 .reminder-detail-text {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 16px;
   color: var(--tg-theme-text-color);
-  margin: 0 0 $spacing-xs 0;
-  line-height: 1.4;
-}
-
-.reminder-detail-client {
-  font-size: 14px;
-  color: var(--tg-theme-hint-color);
   margin: 0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
-.reminder-detail-info {
+.reminder-detail-status {
   margin-top: $spacing-lg;
-  padding-top: $spacing-lg;
+  padding-top: $spacing-md;
   border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
 }
 
 .info-row {
