@@ -7,6 +7,7 @@
  */
 
 import { createSupabaseClient } from '../../../lib/supabase';
+import { getUserIdFromRequest } from '../../../lib/telegram-server';
 
 export default async function handler(req, res) {
   const { method } = req;
@@ -17,6 +18,13 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Получаем user_id из запроса
+    const userId = getUserIdFromRequest(req);
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'User ID не найден. Приложение должно быть запущено в Telegram.' });
+    }
+    
     const supabase = createSupabaseClient();
     
     switch (method) {
@@ -25,6 +33,7 @@ export default async function handler(req, res) {
           .from('clients')
           .select('*')
           .eq('id', id)
+          .eq('user_id', userId)
           .single();
         
         if (error) throw error;
@@ -36,6 +45,18 @@ export default async function handler(req, res) {
       
       case 'PUT': {
         const { name, phone, email, company, notes } = req.body;
+        
+        // Проверяем, что клиент принадлежит пользователю
+        const { data: existingClient } = await supabase
+          .from('clients')
+          .select('id')
+          .eq('id', id)
+          .eq('user_id', userId)
+          .single();
+        
+        if (!existingClient) {
+          return res.status(404).json({ error: 'Клиент не найден или не принадлежит вам' });
+        }
         
         const updateData = {};
         if (name !== undefined) updateData.name = name.trim();
@@ -49,6 +70,7 @@ export default async function handler(req, res) {
           .from('clients')
           .update(updateData)
           .eq('id', id)
+          .eq('user_id', userId)
           .select()
           .single();
         
@@ -60,15 +82,28 @@ export default async function handler(req, res) {
       }
       
       case 'DELETE': {
+        // Проверяем, что клиент принадлежит пользователю
+        const { data: existingClient } = await supabase
+          .from('clients')
+          .select('id')
+          .eq('id', id)
+          .eq('user_id', userId)
+          .single();
+        
+        if (!existingClient) {
+          return res.status(404).json({ error: 'Клиент не найден или не принадлежит вам' });
+        }
+        
         // Удаляем связанные заметки и напоминания
-        await supabase.from('notes').delete().eq('client_id', id);
-        await supabase.from('reminders').delete().eq('client_id', id);
+        await supabase.from('notes').delete().eq('client_id', id).eq('user_id', userId);
+        await supabase.from('reminders').delete().eq('client_id', id).eq('user_id', userId);
         
         // Удаляем клиента
         const { error } = await supabase
           .from('clients')
           .delete()
-          .eq('id', id);
+          .eq('id', id)
+          .eq('user_id', userId);
         
         if (error) throw error;
         return res.status(200).json({ success: true });

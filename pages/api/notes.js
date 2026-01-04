@@ -7,17 +7,25 @@
  */
 
 import { createSupabaseClient } from '../../lib/supabase';
+import { getUserIdFromRequest } from '../../lib/telegram-server';
 
 export default async function handler(req, res) {
   const { method } = req;
 
   try {
+    // Получаем user_id из запроса
+    const userId = getUserIdFromRequest(req);
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'User ID не найден. Приложение должно быть запущено в Telegram.' });
+    }
+    
     const supabase = createSupabaseClient();
     switch (method) {
       case 'GET': {
         const { client_id } = req.query;
         
-        let query = supabase.from('notes').select('*');
+        let query = supabase.from('notes').select('*').eq('user_id', userId);
         
         if (client_id) {
           query = query.eq('client_id', client_id);
@@ -36,10 +44,25 @@ export default async function handler(req, res) {
           return res.status(400).json({ error: 'Текст заметки обязателен' });
         }
         
+        // Если указан client_id, проверяем, что клиент принадлежит пользователю
+        if (client_id) {
+          const { data: client } = await supabase
+            .from('clients')
+            .select('id')
+            .eq('id', client_id)
+            .eq('user_id', userId)
+            .single();
+          
+          if (!client) {
+            return res.status(404).json({ error: 'Клиент не найден или не принадлежит вам' });
+          }
+        }
+        
         const { data, error } = await supabase
           .from('notes')
           .insert([
             {
+              user_id: userId,
               client_id: client_id || null,
               text: text.trim(),
             }

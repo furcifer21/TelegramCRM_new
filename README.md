@@ -68,6 +68,7 @@ CRM система, интегрированная с Telegram через Mini A
 -- Таблица клиентов
 CREATE TABLE IF NOT EXISTS clients (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id TEXT NOT NULL,
   name TEXT NOT NULL,
   phone TEXT,
   email TEXT,
@@ -80,6 +81,7 @@ CREATE TABLE IF NOT EXISTS clients (
 -- Таблица заметок
 CREATE TABLE IF NOT EXISTS notes (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id TEXT NOT NULL,
   client_id UUID REFERENCES clients(id) ON DELETE CASCADE,
   text TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -88,6 +90,7 @@ CREATE TABLE IF NOT EXISTS notes (
 -- Таблица напоминаний
 CREATE TABLE IF NOT EXISTS reminders (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id TEXT NOT NULL,
   client_id UUID REFERENCES clients(id) ON DELETE CASCADE,
   text TEXT NOT NULL,
   date DATE NOT NULL,
@@ -100,7 +103,7 @@ CREATE TABLE IF NOT EXISTS reminders (
 
 -- Таблица настроек
 CREATE TABLE IF NOT EXISTS settings (
-  user_id TEXT PRIMARY KEY DEFAULT 'default',
+  user_id TEXT PRIMARY KEY,
   notifications BOOLEAN DEFAULT TRUE,
   sound BOOLEAN DEFAULT TRUE,
   language TEXT DEFAULT 'ru',
@@ -110,13 +113,44 @@ CREATE TABLE IF NOT EXISTS settings (
 );
 
 -- Индексы для оптимизации запросов
+CREATE INDEX IF NOT EXISTS idx_clients_user_id ON clients(user_id);
+CREATE INDEX IF NOT EXISTS idx_clients_updated_at ON clients(updated_at);
+CREATE INDEX IF NOT EXISTS idx_notes_user_id ON notes(user_id);
 CREATE INDEX IF NOT EXISTS idx_notes_client_id ON notes(client_id);
+CREATE INDEX IF NOT EXISTS idx_reminders_user_id ON reminders(user_id);
 CREATE INDEX IF NOT EXISTS idx_reminders_client_id ON reminders(client_id);
 CREATE INDEX IF NOT EXISTS idx_reminders_archived ON reminders(archived);
-CREATE INDEX IF NOT EXISTS idx_clients_updated_at ON clients(updated_at);
 ```
 
 3. Нажмите **Run** для выполнения скрипта
+
+#### Миграция существующих данных (если таблицы уже созданы)
+
+Если вы уже создали таблицы без `user_id`, выполните этот скрипт для добавления колонки:
+
+```sql
+-- Добавляем user_id в существующие таблицы
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS user_id TEXT;
+ALTER TABLE notes ADD COLUMN IF NOT EXISTS user_id TEXT;
+ALTER TABLE reminders ADD COLUMN IF NOT EXISTS user_id TEXT;
+
+-- Обновляем существующие записи (если есть)
+-- ВНИМАНИЕ: Это установит user_id = 'default' для всех существующих записей
+-- После этого каждый пользователь должен будет создать свои данные заново
+UPDATE clients SET user_id = 'default' WHERE user_id IS NULL;
+UPDATE notes SET user_id = 'default' WHERE user_id IS NULL;
+UPDATE reminders SET user_id = 'default' WHERE user_id IS NULL;
+
+-- Делаем user_id обязательным
+ALTER TABLE clients ALTER COLUMN user_id SET NOT NULL;
+ALTER TABLE notes ALTER COLUMN user_id SET NOT NULL;
+ALTER TABLE reminders ALTER COLUMN user_id SET NOT NULL;
+
+-- Добавляем индексы
+CREATE INDEX IF NOT EXISTS idx_clients_user_id ON clients(user_id);
+CREATE INDEX IF NOT EXISTS idx_notes_user_id ON notes(user_id);
+CREATE INDEX IF NOT EXISTS idx_reminders_user_id ON reminders(user_id);
+```
 
 #### Настройка Row Level Security (RLS)
 
@@ -129,8 +163,63 @@ ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reminders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
 
--- Разрешаем все операции для анонимных пользователей (для упрощения)
--- В production рекомендуется настроить более строгие политики
+-- Политики для клиентов: пользователи видят только своих клиентов
+CREATE POLICY "Users can view own clients" ON clients
+  FOR SELECT USING (auth.uid()::text = user_id OR user_id = current_setting('request.jwt.claims', true)::json->>'user_id');
+
+CREATE POLICY "Users can insert own clients" ON clients
+  FOR INSERT WITH CHECK (user_id = current_setting('request.jwt.claims', true)::json->>'user_id');
+
+CREATE POLICY "Users can update own clients" ON clients
+  FOR UPDATE USING (user_id = current_setting('request.jwt.claims', true)::json->>'user_id');
+
+CREATE POLICY "Users can delete own clients" ON clients
+  FOR DELETE USING (user_id = current_setting('request.jwt.claims', true)::json->>'user_id');
+
+-- Политики для заметок: пользователи видят только свои заметки
+CREATE POLICY "Users can view own notes" ON notes
+  FOR SELECT USING (user_id = current_setting('request.jwt.claims', true)::json->>'user_id');
+
+CREATE POLICY "Users can insert own notes" ON notes
+  FOR INSERT WITH CHECK (user_id = current_setting('request.jwt.claims', true)::json->>'user_id');
+
+CREATE POLICY "Users can delete own notes" ON notes
+  FOR DELETE USING (user_id = current_setting('request.jwt.claims', true)::json->>'user_id');
+
+-- Политики для напоминаний: пользователи видят только свои напоминания
+CREATE POLICY "Users can view own reminders" ON reminders
+  FOR SELECT USING (user_id = current_setting('request.jwt.claims', true)::json->>'user_id');
+
+CREATE POLICY "Users can insert own reminders" ON reminders
+  FOR INSERT WITH CHECK (user_id = current_setting('request.jwt.claims', true)::json->>'user_id');
+
+CREATE POLICY "Users can update own reminders" ON reminders
+  FOR UPDATE USING (user_id = current_setting('request.jwt.claims', true)::json->>'user_id');
+
+CREATE POLICY "Users can delete own reminders" ON reminders
+  FOR DELETE USING (user_id = current_setting('request.jwt.claims', true)::json->>'user_id');
+
+-- Политики для настроек: пользователи видят только свои настройки
+CREATE POLICY "Users can view own settings" ON settings
+  FOR SELECT USING (user_id = current_setting('request.jwt.claims', true)::json->>'user_id');
+
+CREATE POLICY "Users can insert own settings" ON settings
+  FOR INSERT WITH CHECK (user_id = current_setting('request.jwt.claims', true)::json->>'user_id');
+
+CREATE POLICY "Users can update own settings" ON settings
+  FOR UPDATE USING (user_id = current_setting('request.jwt.claims', true)::json->>'user_id');
+
+-- Упрощенная версия: разрешаем все операции для анонимных пользователей
+-- (так как мы используем anon ключ и проверяем user_id в API)
+-- ВНИМАНИЕ: Это работает только если вы проверяете user_id в API endpoints!
+-- Для большей безопасности используйте политики выше с проверкой через JWT
+DROP POLICY IF EXISTS "Allow all for clients" ON clients;
+DROP POLICY IF EXISTS "Allow all for notes" ON notes;
+DROP POLICY IF EXISTS "Allow all for reminders" ON reminders;
+DROP POLICY IF EXISTS "Allow all for settings" ON settings;
+
+-- Временная политика для работы через API (пока не настроен JWT)
+-- В production рекомендуется использовать JWT и политики выше
 CREATE POLICY "Allow all for clients" ON clients FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all for notes" ON notes FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all for reminders" ON reminders FOR ALL USING (true) WITH CHECK (true);
@@ -302,7 +391,7 @@ telegram-crm/
 - Напоминания
 - Настройки пользователя
 
-Данные синхронизируются между всеми устройствами пользователя автоматически.
+**Важно:** Каждый пользователь Telegram имеет свои собственные данные. Данные изолированы по `user_id` - пользователи не видят данные друг друга. Данные синхронизируются между всеми устройствами одного пользователя автоматически.
 
 ## 🚀 Запуск в Telegram
 

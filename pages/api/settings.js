@@ -6,19 +6,27 @@
  */
 
 import { createSupabaseClient } from '../../lib/supabase';
+import { getUserIdFromRequest } from '../../lib/telegram-server';
 
 export default async function handler(req, res) {
   const { method } = req;
 
   try {
+    // Получаем user_id из запроса
+    const userId = getUserIdFromRequest(req);
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'User ID не найден. Приложение должно быть запущено в Telegram.' });
+    }
+    
     const supabase = createSupabaseClient();
     switch (method) {
       case 'GET': {
-        // Получаем настройки (можно добавить user_id позже для мультипользовательского режима)
+        // Получаем настройки пользователя
         const { data, error } = await supabase
           .from('settings')
           .select('*')
-          .eq('user_id', 'default') // Пока используем default, позже можно добавить user_id из Telegram
+          .eq('user_id', userId)
           .single();
         
         if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
@@ -42,7 +50,7 @@ export default async function handler(req, res) {
         const { notifications, sound, language, theme } = req.body;
         
         const settingsData = {
-          user_id: 'default', // Пока используем default
+          user_id: userId,
           notifications: notifications !== undefined ? notifications : true,
           sound: sound !== undefined ? sound : true,
           language: language || 'ru',

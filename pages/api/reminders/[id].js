@@ -6,6 +6,7 @@
  */
 
 import { createSupabaseClient } from '../../../lib/supabase';
+import { getUserIdFromRequest } from '../../../lib/telegram-server';
 
 export default async function handler(req, res) {
   const { method } = req;
@@ -16,10 +17,29 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Получаем user_id из запроса
+    const userId = getUserIdFromRequest(req);
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'User ID не найден. Приложение должно быть запущено в Telegram.' });
+    }
+    
     const supabase = createSupabaseClient();
     
     switch (method) {
       case 'PUT': {
+        // Проверяем, что напоминание принадлежит пользователю
+        const { data: existingReminder } = await supabase
+          .from('reminders')
+          .select('id')
+          .eq('id', id)
+          .eq('user_id', userId)
+          .single();
+        
+        if (!existingReminder) {
+          return res.status(404).json({ error: 'Напоминание не найдено или не принадлежит вам' });
+        }
+        
         const updateData = {};
         const { text, date, time, notified, archived } = req.body;
         
@@ -38,6 +58,7 @@ export default async function handler(req, res) {
           .from('reminders')
           .update(updateData)
           .eq('id', id)
+          .eq('user_id', userId)
           .select()
           .single();
         
@@ -49,10 +70,23 @@ export default async function handler(req, res) {
       }
       
       case 'DELETE': {
+        // Проверяем, что напоминание принадлежит пользователю
+        const { data: existingReminder } = await supabase
+          .from('reminders')
+          .select('id')
+          .eq('id', id)
+          .eq('user_id', userId)
+          .single();
+        
+        if (!existingReminder) {
+          return res.status(404).json({ error: 'Напоминание не найдено или не принадлежит вам' });
+        }
+        
         const { error } = await supabase
           .from('reminders')
           .delete()
-          .eq('id', id);
+          .eq('id', id)
+          .eq('user_id', userId);
         
         if (error) throw error;
         return res.status(200).json({ success: true });
