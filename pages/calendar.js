@@ -1,8 +1,8 @@
 /**
- * Страница календаря с напоминаниями
+ * Страница календаря с событиями
  * 
- * Отображает календарь с напоминаниями, позволяет переключать месяцы
- * и переходить к напоминаниям по выбранной дате
+ * Отображает календарь с событиями, позволяет переключать месяцы
+ * и переходить к событиям по выбранной дате
  */
 
 import { useState, useEffect } from 'react';
@@ -20,13 +20,13 @@ export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
   
-  // Загружаем напоминания при загрузке страницы
+  // Загружаем события при загрузке страницы
   useEffect(() => {
     loadReminders();
   }, []);
   
   /**
-   * Загружает все напоминания
+   * Загружает все события
    */
   const loadReminders = async () => {
     setLoading(true);
@@ -43,7 +43,7 @@ export default function Calendar() {
   };
   
   /**
-   * Получает напоминания для конкретной даты
+   * Получает события для конкретной даты
    */
   const getRemindersForDate = (date) => {
     const dateStr = date.toISOString().split('T')[0];
@@ -72,7 +72,7 @@ export default function Calendar() {
   };
   
   /**
-   * Обработчик клика на дату с напоминанием
+   * Обработчик клика на дату с событием
    */
   const handleDateClick = (date) => {
     const dateStr = date.toISOString().split('T')[0];

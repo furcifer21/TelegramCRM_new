@@ -1,7 +1,7 @@
 /**
- * Страница со всеми напоминаниями
+ * Страница со всеми событиями
  * 
- * Отображает все активные (неархивные) напоминания
+ * Отображает все активные (неархивные) события
  */
 
 import { useState, useEffect } from 'react';
@@ -31,7 +31,7 @@ export default function Reminders() {
   }, []);
   
   /**
-   * Загружает напоминания и клиентов
+   * Загружает события и клиентов
    */
   const loadData = async () => {
     setLoading(true);
@@ -113,7 +113,7 @@ export default function Reminders() {
         }
       });
     } else {
-      if (confirm('Удалить напоминание?')) {
+      if (confirm('Удалить событие?')) {
         try {
           await deleteReminder(id);
           await loadData();
@@ -126,7 +126,7 @@ export default function Reminders() {
   };
   
   /**
-   * Фильтрует напоминания по поисковому запросу и дате
+   * Фильтрует события по поисковому запросу и дате
    */
   const filteredReminders = reminders.filter(reminder => {
     // Фильтр по дате (если передан в query параметрах)
@@ -147,7 +147,7 @@ export default function Reminders() {
   return (
     <div className="reminders-page">
       <div className="page-header">
-        <h1 className="page-title">Напоминания</h1>
+        <h1 className="page-title">События</h1>
         <div className="page-actions">
           <Button
             variant="secondary"

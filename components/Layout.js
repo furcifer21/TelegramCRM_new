@@ -74,7 +74,7 @@ function LayoutContent({ children }) {
           // Показываем уведомление для каждого активного напоминания
           for (const reminder of activeReminders) {
             // Формируем текст сообщения
-            const messageText = `⏰ Напоминание\n\n${reminder.text || 'У вас есть напоминание!'}`;
+            const messageText = `⏰ Событие\n\n${reminder.text || 'У вас есть событие!'}`;
             
             // Показываем уведомление в чате через showAlert
             webApp.showAlert(messageText);

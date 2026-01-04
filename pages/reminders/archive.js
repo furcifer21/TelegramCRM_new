@@ -85,7 +85,7 @@ export default function RemindersArchive() {
    */
   const handleDelete = async (id) => {
     if (webApp) {
-      webApp.showConfirm('Удалить напоминание из архива?', async (confirmed) => {
+      webApp.showConfirm('Удалить событие из архива?', async (confirmed) => {
         if (confirmed) {
           try {
             await deleteReminder(id);
@@ -100,7 +100,7 @@ export default function RemindersArchive() {
         }
       });
     } else {
-      if (confirm('Удалить напоминание из архива?')) {
+      if (confirm('Удалить событие из архива?')) {
         try {
           await deleteReminder(id);
           await loadData();

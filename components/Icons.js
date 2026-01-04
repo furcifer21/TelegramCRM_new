@@ -58,3 +58,7 @@ export const CalendarIcon = ({ className = '', width, height }) => (
   <Icon name="calendar" className={className} width={width} height={height} />
 );
 
+export const InfoIcon = ({ className = '', width, height }) => (
+  <Icon name="info" className={className} width={width} height={height} />
+);
+

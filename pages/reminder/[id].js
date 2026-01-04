@@ -61,7 +61,7 @@ export default function ReminderDetail() {
       
       if (!reminderData) {
         if (webApp) {
-          webApp.showAlert('Напоминание не найдено');
+          webApp.showAlert('Событие не найдено');
         }
         router.push('/reminders');
         return;
@@ -139,7 +139,7 @@ export default function ReminderDetail() {
    */
   const handleDelete = async () => {
     if (webApp) {
-      webApp.showConfirm('Удалить напоминание?', async (confirmed) => {
+      webApp.showConfirm('Удалить событие?', async (confirmed) => {
         if (confirmed) {
           try {
             await deleteReminder(id);
@@ -154,7 +154,7 @@ export default function ReminderDetail() {
         }
       });
     } else {
-      if (confirm('Удалить напоминание?')) {
+      if (confirm('Удалить событие?')) {
         try {
           await deleteReminder(id);
           router.push('/reminders');
@@ -208,7 +208,7 @@ export default function ReminderDetail() {
         >
           <ArrowLeftIcon className="icon" />
         </Button>
-        <h1 className="page-title">Напоминание</h1>
+        <h1 className="page-title">Событие</h1>
         <div className="page-actions">
           {!editing ? (
             <>

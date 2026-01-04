@@ -15,7 +15,8 @@ import { getClients, getReminders, getActiveReminders, getNotes } from '../lib/c
 import { useLoader } from '../contexts/LoaderContext';
 import Card from '../components/Card';
 import Button from '../components/Button';
-import { ClockIcon, FileTextIcon, UsersIcon, PlusIcon } from '../components/Icons';
+import Modal from '../components/Modal';
+import { ClockIcon, FileTextIcon, UsersIcon, PlusIcon, InfoIcon } from '../components/Icons';
 
 export default function Home() {
   const router = useRouter();
@@ -29,6 +30,7 @@ export default function Home() {
     todayRemindersCount: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [showInfoModal, setShowInfoModal] = useState(false);
   
   const webApp = getTelegramWebApp();
   
@@ -146,22 +148,91 @@ export default function Home() {
   
   return (
     <div className="home">
-      <h1 className="home-title">
-        {user ? `Привет, ${user.first_name}!` : 'CRM система'}
-      </h1>
+      <div className="home-title-wrapper">
+        <h1 className="home-title">
+          {user ? `Привет, ${user.first_name}!` : 'CRM система'}
+        </h1>
+        <button 
+          className="home-info-button"
+          onClick={() => setShowInfoModal(true)}
+          aria-label="Информация о приложении"
+        >
+          <InfoIcon className="home-info-icon" width={20} height={20} />
+        </button>
+      </div>
       
-      {/* Напоминания сегодня */}
+      {/* Модалка с информацией о приложении */}
+      <Modal
+        isOpen={showInfoModal}
+        onClose={() => setShowInfoModal(false)}
+        title="О приложении"
+      >
+        <div className="app-info-content">
+          <div className="app-info-section">
+            <h3 className="app-info-section-title">Для кого</h3>
+            <p className="app-info-text">
+              CRM система для управления клиентами, событиями и заметками. 
+              Подходит для малого бизнеса, фрилансеров и всех, кому нужно 
+              организовать работу с клиентами.
+            </p>
+          </div>
+          
+          <div className="app-info-section">
+            <h3 className="app-info-section-title">Основные возможности</h3>
+            <ul className="app-info-list">
+              <li className="app-info-list-item">
+                <strong>Клиенты</strong> — управление базой клиентов с контактами и информацией
+              </li>
+              <li className="app-info-list-item">
+                <strong>События</strong> — напоминания, встречи, задачи с привязкой к дате и времени
+              </li>
+              <li className="app-info-list-item">
+                <strong>Заметки</strong> — хранение важной информации и записей
+              </li>
+              <li className="app-info-list-item">
+                <strong>Календарь</strong> — визуальный просмотр событий по датам
+              </li>
+            </ul>
+          </div>
+          
+          <div className="app-info-section">
+            <h3 className="app-info-section-title">Преимущества</h3>
+            <ul className="app-info-list">
+              <li className="app-info-list-item">
+                Работает прямо в Telegram — не нужно устанавливать отдельное приложение
+              </li>
+              <li className="app-info-list-item">
+                Все данные синхронизируются в облаке
+              </li>
+              <li className="app-info-list-item">
+                Простой и понятный интерфейс
+              </li>
+              <li className="app-info-list-item">
+                Быстрый доступ к важной информации
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <div className="app-info-actions">
+          <Button onClick={() => setShowInfoModal(false)}>
+            Понятно
+          </Button>
+        </div>
+      </Modal>
+      
+      {/* События сегодня */}
       <Card>
-        <h2 className="home-card-title">Напоминания сегодня</h2>
+        <h2 className="home-card-title">События сегодня</h2>
         {!loading && (
           <div className="home-today-reminders">
             <span className="today-reminders-value">{stats.todayRemindersCount}</span>
             <span className="today-reminders-label">
               {stats.todayRemindersCount === 1 
-                ? 'напоминание' 
+                ? 'событие' 
                 : stats.todayRemindersCount > 1 && stats.todayRemindersCount < 5
-                ? 'напоминания'
-                : 'напоминаний'}
+                ? 'события'
+                : 'событий'}
             </span>
           </div>
         )}
@@ -182,17 +253,17 @@ export default function Home() {
         </div>
       </Card>
       
-      {/* Напоминания */}
+      {/* События */}
       <Card>
-        <h2 className="home-card-title">Напоминания</h2>
+        <h2 className="home-card-title">События</h2>
         <div className="home-actions">
           <Button onClick={handleViewReminders} variant="secondary" className="action-button">
             <ClockIcon className="action-icon" />
-            Все напоминания
+            Все события
           </Button>
           <Button onClick={handleCreateReminder} variant="secondary" className="action-button">
             <PlusIcon className="action-icon" />
-            Создать напоминание
+            Создать событие
           </Button>
         </div>
       </Card>

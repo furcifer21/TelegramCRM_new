@@ -120,7 +120,7 @@ export default function NewReminder() {
   return (
     <div className="reminder-form-page">
       <div className="page-header">
-        <h1 className="page-title">Новое напоминание</h1>
+        <h1 className="page-title">Новое событие</h1>
       </div>
       
       <form onSubmit={handleSubmit} className="reminder-form">
@@ -144,10 +144,10 @@ export default function NewReminder() {
               </div>
               
               <Textarea
-                label="Текст напоминания *"
+                label="Текст события *"
                 value={formData.text}
                 onChange={(e) => handleChange('text', e.target.value)}
-                placeholder="О чем нужно напомнить?"
+                placeholder="Опишите событие, напоминание или запись"
                 required
                 rows={4}
               />

@@ -12,6 +12,6 @@
 .layout-main {
   flex: 1;
   @include container;
-  padding: 80px var(--spacing);
+  padding: 40px var(--spacing) 80px;
 }
 

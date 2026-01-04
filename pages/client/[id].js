@@ -263,7 +263,7 @@ export default function ClientDetail() {
    */
   const handleDeleteReminder = async (reminderId) => {
     if (webApp) {
-      webApp.showConfirm('Удалить напоминание?', async (confirmed) => {
+      webApp.showConfirm('Удалить событие?', async (confirmed) => {
         if (confirmed) {
           try {
             await deleteReminder(reminderId);
@@ -277,7 +277,7 @@ export default function ClientDetail() {
         }
       });
     } else {
-      if (confirm('Удалить напоминание?')) {
+      if (confirm('Удалить событие?')) {
         await deleteReminder(reminderId);
         await loadData();
       }
@@ -402,10 +402,10 @@ export default function ClientDetail() {
         )}
       </Card>
       
-      {/* Напоминания */}
+      {/* События */}
       <Card>
         <div className="section-header">
-          <h2 className="section-title">Напоминания</h2>
+          <h2 className="section-title">События</h2>
           <Button
             variant="secondary"
             onClick={() => setShowReminderModal(true)}
@@ -416,7 +416,7 @@ export default function ClientDetail() {
         </div>
         
         {reminders.length === 0 ? (
-          <p className="empty-section">Нет напоминаний</p>
+          <p className="empty-section">Нет событий</p>
         ) : (
           <div className="reminders-list">
             {reminders.map((reminder) => {
@@ -501,7 +501,7 @@ export default function ClientDetail() {
             time: '09:00',
           });
         }}
-        title="Новое напоминание"
+        title="Новое событие"
       >
         <Textarea
           value={reminderData.text}

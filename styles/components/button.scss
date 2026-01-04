@@ -14,9 +14,11 @@
     background-color: var(--primary-color);
     color: #ffffff;
     
-    &:hover:not(:disabled) {
-      background-color: var(--primary-light);
-      transform: translateY(-1px);
+    @media (min-width: 1200px) {
+      &:hover:not(:disabled) {
+        background-color: var(--primary-light);
+        transform: translateY(-1px);
+      }
     }
     
     &:active:not(:disabled) {
@@ -30,9 +32,11 @@
     color: var(--text-color);
     border: 1px solid var(--border-color);
     
-    &:hover:not(:disabled) {
-      background-color: var(--secondary-dark);
-      border-color: var(--primary-color);
+    @media (min-width: 1200px) {
+      &:hover:not(:disabled) {
+        background-color: var(--secondary-dark);
+        border-color: var(--primary-color);
+      }
     }
     
     &:active:not(:disabled) {
@@ -44,9 +48,11 @@
     background-color: var(--accent-color);
     color: #ffffff;
     
-    &:hover:not(:disabled) {
-      background-color: #0891b2;
-      transform: translateY(-1px);
+    @media (min-width: 1200px) {
+      &:hover:not(:disabled) {
+        background-color: #0891b2;
+        transform: translateY(-1px);
+      }
     }
   }
   
@@ -54,9 +60,11 @@
     background-color: var(--success-color);
     color: #ffffff;
     
-    &:hover:not(:disabled) {
-      background-color: #10b981;
-      transform: translateY(-1px);
+    @media (min-width: 1200px) {
+      &:hover:not(:disabled) {
+        background-color: #10b981;
+        transform: translateY(-1px);
+      }
     }
   }
   
@@ -64,9 +72,11 @@
     background-color: var(--error-color);
     color: #ffffff;
     
-    &:hover:not(:disabled) {
-      background-color: #f87171;
-      transform: translateY(-1px);
+    @media (min-width: 1200px) {
+      &:hover:not(:disabled) {
+        background-color: #f87171;
+        transform: translateY(-1px);
+      }
     }
   }
   
