@@ -1,0 +1,72 @@
+@import '../variables.scss';
+@import '../mixins.scss';
+
+.reminder-detail-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+}
+
+.reminder-detail-content {
+  padding: $spacing-sm 0;
+}
+
+.reminder-detail-header {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.reminder-detail-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--tg-theme-button-color);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.reminder-detail-text {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--tg-theme-text-color);
+  margin: 0 0 $spacing-xs 0;
+  line-height: 1.4;
+}
+
+.reminder-detail-client {
+  font-size: 14px;
+  color: var(--tg-theme-hint-color);
+  margin: 0;
+}
+
+.reminder-detail-info {
+  margin-top: $spacing-lg;
+  padding-top: $spacing-lg;
+  border-top: 1px solid var(--border-color);
+}
+
+.info-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: $spacing-md;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.info-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tg-theme-hint-color);
+  margin-bottom: $spacing-xs;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  font-size: 16px;
+  color: var(--tg-theme-text-color);
+}
+
