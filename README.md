@@ -233,15 +233,11 @@ CREATE POLICY "Allow all for settings" ON settings FOR ALL USING (true) WITH CHE
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
-BOT_SECRET=1234567890:ABCdefGHIjklMNOpqrsTUVwxyz
-CRON_SECRET=your-secret-key-here
 ```
 
-**Переменные окружения:**
-- **NEXT_PUBLIC_SUPABASE_URL** - найдите в Supabase: Settings → API → Project URL
-- **NEXT_PUBLIC_SUPABASE_ANON_KEY** - найдите в Supabase: Settings → API → anon public
-- **BOT_SECRET** - токен вашего Telegram бота (получите у @BotFather). Используется для отправки напоминаний через Bot API
-- **CRON_SECRET** (опционально) - секретный ключ для защиты cron endpoint
+2. Замените значения на ваши данные из Supabase:
+   - **NEXT_PUBLIC_SUPABASE_URL** - найдите в Supabase: Settings → API → Project URL
+   - **NEXT_PUBLIC_SUPABASE_ANON_KEY** - найдите в Supabase: Settings → API → anon public
 
 2. Замените значения на ваши данные из Supabase:
    - **NEXT_PUBLIC_SUPABASE_URL** - найдите в Supabase: Settings → API → Project URL
@@ -355,11 +351,9 @@ telegram-crm/
 4. Нажмите "Сохранить"
 
 #### Автоматические уведомления
-- Система автоматически проверяет напоминания каждый час
-- При наступлении времени напоминания вы получите сообщение в чат с ботом в Telegram
-- Напоминание будет помечено как отправленное
-- **Важно:** Для получения напоминаний убедитесь, что вы начали диалог с ботом (отправьте `/start` или откройте Mini App)
-- **Примечание:** Напоминания могут прийти с задержкой до 1 часа (в зависимости от расписания cron)
+- Система автоматически проверяет напоминания каждую минуту
+- При наступлении времени напоминания вы получите уведомление в Telegram
+- Напоминание будет помечено как уведомленное
 
 ### Заметки
 
@@ -383,32 +377,6 @@ telegram-crm/
 ### Keep-alive механизм
 
 Приложение автоматически отправляет keep-alive запросы к Supabase каждые 5 минут, чтобы предотвратить переход базы данных в режим сна на бесплатном тарифе. Это реализовано в `pages/_app.js` и использует endpoint `/api/keep-alive`.
-
-### Настройка напоминаний через Telegram Bot API
-
-Для работы напоминаний через Telegram Bot API необходимо:
-
-1. **Получить токен бота:**
-   - Откройте [@BotFather](https://t.me/BotFather) в Telegram
-   - Создайте бота или используйте существующего
-   - Получите токен бота (формат: `1234567890:ABCdefGHIjklMNOpqrsTUVwxyz`)
-
-2. **Добавить токен в переменные окружения:**
-   - Используйте существующую переменную `BOT_SECRET` (если она уже настроена)
-   - Или добавьте `BOT_SECRET` в `.env.local` (для разработки)
-   - Добавьте `BOT_SECRET` в настройки переменных окружения на вашей платформе деплоя (Vercel, Netlify и т.д.)
-   - Примечание: код также поддерживает `TELEGRAM_BOT_TOKEN` для обратной совместимости
-
-3. **Настроить cron job:**
-   - На Vercel: cron job настроен автоматически через `vercel.json` (проверка каждый час)
-   - На других платформах: настройте периодический вызов `/api/cron/check-reminders`
-   - Для безопасности (опционально): установите `CRON_SECRET` в переменных окружения
-   - **Примечание:** На бесплатном плане Vercel (Hobby) cron может запускаться не чаще одного раза в день. Для более частых проверок используйте внешний сервис (cron-job.org, EasyCron и т.д.)
-
-4. **Важно:**
-   - Пользователь должен начать диалог с ботом (отправить `/start` или открыть Mini App)
-   - Напоминания отправляются в чат с ботом, а не как push-уведомления
-   - Система проверяет напоминания каждые 5 минут
 
 ### Настройка бота в Telegram
 
