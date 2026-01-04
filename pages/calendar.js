@@ -8,12 +8,14 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { getNonArchivedReminders } from '../lib/crm';
+import { useLoader } from '../contexts/LoaderContext';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import { ClockIcon, ArrowLeftIcon } from '../components/Icons';
 
 export default function Calendar() {
   const router = useRouter();
+  const { setLoading: setGlobalLoading } = useLoader();
   const [reminders, setReminders] = useState([]);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
@@ -28,6 +30,7 @@ export default function Calendar() {
    */
   const loadReminders = async () => {
     setLoading(true);
+    setGlobalLoading(true);
     try {
       const remindersData = await getNonArchivedReminders();
       setReminders(remindersData);
@@ -35,6 +38,7 @@ export default function Calendar() {
       console.error('Error loading reminders:', error);
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   };
   
@@ -182,11 +186,7 @@ export default function Calendar() {
       </Card>
       
       {/* Календарь */}
-      {loading ? (
-        <Card>
-          <p>Загрузка...</p>
-        </Card>
-      ) : (
+      {!loading && (
         <Card>
           <div className="calendar-grid">
             {/* Заголовки дней недели */}

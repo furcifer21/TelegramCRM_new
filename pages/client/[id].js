@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { getClient, deleteClient, getClientNotes, getClientReminders, createNote, deleteNote, createReminder, deleteReminder } from '../../lib/crm';
 import { getTelegramWebApp } from '../../lib/telegram';
+import { useLoader } from '../../contexts/LoaderContext';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Modal from '../../components/Modal';
@@ -20,6 +21,7 @@ export default function ClientDetail() {
   const router = useRouter();
   const { id } = router.query;
   const webApp = getTelegramWebApp();
+  const { setLoading: setGlobalLoading } = useLoader();
   
   const [client, setClient] = useState(null);
   const [notes, setNotes] = useState([]);
@@ -50,6 +52,7 @@ export default function ClientDetail() {
    */
   const loadData = async () => {
     setLoading(true);
+    setGlobalLoading(true);
     try {
       const clientData = await getClient(id);
       if (!clientData) {
@@ -108,6 +111,7 @@ export default function ClientDetail() {
       }
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   };
   
@@ -262,17 +266,7 @@ export default function ClientDetail() {
     }
   };
   
-  if (loading) {
-    return (
-      <div className="client-detail-page">
-        <Card>
-          <p>Загрузка...</p>
-        </Card>
-      </div>
-    );
-  }
-  
-  if (!client) {
+  if (!client && !loading) {
     return null;
   }
   

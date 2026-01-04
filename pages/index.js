@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { getTelegramUser, getTelegramWebApp } from '../lib/telegram';
 import { getClients, getReminders, getActiveReminders, getNotes } from '../lib/crm';
+import { useLoader } from '../contexts/LoaderContext';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import { ClockIcon, FileTextIcon, UsersIcon, PlusIcon } from '../components/Icons';
@@ -19,6 +20,7 @@ import { ClockIcon, FileTextIcon, UsersIcon, PlusIcon } from '../components/Icon
 export default function Home() {
   const router = useRouter();
   const [user] = useState(getTelegramUser());
+  const { setLoading: setGlobalLoading } = useLoader();
   const [stats, setStats] = useState({
     clientsCount: 0,
     remindersCount: 0,
@@ -47,6 +49,7 @@ export default function Home() {
    */
   const loadStats = async () => {
     setLoading(true);
+    setGlobalLoading(true);
     try {
       const [clients, reminders, activeReminders, notes] = await Promise.all([
         getClients(),
@@ -70,6 +73,7 @@ export default function Home() {
       console.error('Error loading stats:', error);
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   };
   
@@ -149,9 +153,7 @@ export default function Home() {
       {/* Напоминания сегодня */}
       <Card>
         <h2 className="home-card-title">Напоминания сегодня</h2>
-        {loading ? (
-          <p>Загрузка...</p>
-        ) : (
+        {!loading && (
           <div className="home-today-reminders">
             <span className="today-reminders-value">{stats.todayRemindersCount}</span>
             <span className="today-reminders-label">

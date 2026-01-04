@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { getNotes, getClients, deleteNote } from '../lib/crm';
 import { getTelegramWebApp } from '../lib/telegram';
+import { useLoader } from '../contexts/LoaderContext';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import { FileTextIcon, PlusIcon, TrashIcon, FilterIcon } from '../components/Icons';
@@ -15,6 +16,7 @@ import { FileTextIcon, PlusIcon, TrashIcon, FilterIcon } from '../components/Ico
 export default function Notes() {
   const router = useRouter();
   const webApp = getTelegramWebApp();
+  const { setLoading: setGlobalLoading } = useLoader();
   
   const [notes, setNotes] = useState([]);
   const [clients, setClients] = useState([]);
@@ -31,6 +33,7 @@ export default function Notes() {
    */
   const loadData = async () => {
     setLoading(true);
+    setGlobalLoading(true);
     try {
       const [notesData, clientsData] = await Promise.all([
         getNotes(),
@@ -48,6 +51,7 @@ export default function Notes() {
       console.error('Error loading notes:', error);
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   };
   
@@ -168,11 +172,7 @@ export default function Notes() {
       </Card>
       
       {/* Список заметок */}
-      {loading ? (
-        <Card>
-          <p>Загрузка...</p>
-        </Card>
-      ) : filteredNotes.length === 0 ? (
+      {!loading && filteredNotes.length === 0 ? (
         <Card>
           <div className="empty-state">
             <FileTextIcon className="empty-icon" />

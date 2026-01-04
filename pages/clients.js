@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { getClients, searchClients, deleteClient } from '../lib/crm';
 import { getTelegramWebApp } from '../lib/telegram';
+import { useLoader } from '../contexts/LoaderContext';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import Input from '../components/Input';
@@ -16,6 +17,7 @@ import { PlusIcon, EditIcon, TrashIcon } from '../components/Icons';
 
 export default function Clients() {
   const router = useRouter();
+  const { setLoading: setGlobalLoading } = useLoader();
   const [clients, setClients] = useState([]);
   const [filteredClients, setFilteredClients] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,6 +44,7 @@ export default function Clients() {
    */
   const loadClients = async () => {
     setLoading(true);
+    setGlobalLoading(true);
     try {
       const clientsList = await getClients();
       // Сортируем по дате обновления (новые сверху)
@@ -57,6 +60,7 @@ export default function Clients() {
       }
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   };
   
@@ -127,11 +131,7 @@ export default function Clients() {
       </div>
       
       {/* Список клиентов */}
-      {loading ? (
-        <Card>
-          <p>Загрузка...</p>
-        </Card>
-      ) : filteredClients.length === 0 ? (
+      {!loading && filteredClients.length === 0 ? (
         <Card>
           <div className="empty-state">
             <p className="empty-state-text">

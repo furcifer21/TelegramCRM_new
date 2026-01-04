@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { getNonArchivedReminders, getClients, deleteReminder } from '../lib/crm';
 import { getTelegramWebApp } from '../lib/telegram';
+import { useLoader } from '../contexts/LoaderContext';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import { ClockIcon, PlusIcon, ArchiveIcon, TrashIcon } from '../components/Icons';
@@ -15,6 +16,7 @@ import { ClockIcon, PlusIcon, ArchiveIcon, TrashIcon } from '../components/Icons
 export default function Reminders() {
   const router = useRouter();
   const webApp = getTelegramWebApp();
+  const { setLoading: setGlobalLoading } = useLoader();
   
   const [reminders, setReminders] = useState([]);
   const [clients, setClients] = useState([]);
@@ -33,6 +35,7 @@ export default function Reminders() {
    */
   const loadData = async () => {
     setLoading(true);
+    setGlobalLoading(true);
     try {
       const [remindersData, clientsData] = await Promise.all([
         getNonArchivedReminders(),
@@ -52,6 +55,7 @@ export default function Reminders() {
       console.error('Error loading reminders:', error);
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   };
   
@@ -195,11 +199,7 @@ export default function Reminders() {
       </Card>
       
       {/* Список напоминаний */}
-      {loading ? (
-        <Card>
-          <p>Загрузка...</p>
-        </Card>
-      ) : filteredReminders.length === 0 ? (
+      {!loading && filteredReminders.length === 0 ? (
         <Card>
           <div className="empty-state">
             <ClockIcon className="empty-icon" />
