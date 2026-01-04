@@ -24,6 +24,7 @@ export default function Home() {
     remindersCount: 0,
     activeRemindersCount: 0,
     notesCount: 0,
+    todayRemindersCount: 0,
   });
   const [loading, setLoading] = useState(true);
   
@@ -54,11 +55,16 @@ export default function Home() {
         getNotes()
       ]);
       
+      // Подсчитываем напоминания на сегодня
+      const today = new Date().toISOString().split('T')[0];
+      const todayReminders = reminders.filter(reminder => reminder.date === today);
+      
       setStats({
         clientsCount: clients.length,
         remindersCount: reminders.length,
         activeRemindersCount: activeReminders.length,
         notesCount: notes.length,
+        todayRemindersCount: todayReminders.length,
       });
     } catch (error) {
       console.error('Error loading stats:', error);
@@ -140,34 +146,28 @@ export default function Home() {
         {user ? `Привет, ${user.first_name}!` : 'CRM система'}
       </h1>
       
-      {/* Статистика */}
+      {/* Напоминания сегодня */}
       <Card>
-        <h2 className="home-card-title">Статистика</h2>
+        <h2 className="home-card-title">Напоминания сегодня</h2>
         {loading ? (
           <p>Загрузка...</p>
         ) : (
-          <div className="home-stats">
-            <div className="stat-item">
-              <span className="stat-value">{stats.clientsCount}</span>
-              <span className="stat-label">Клиентов</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-value">{stats.remindersCount}</span>
-              <span className="stat-label">Напоминаний</span>
-            </div>
-            {stats.activeRemindersCount > 0 && (
-              <div className="stat-item stat-item-active">
-                <span className="stat-value">{stats.activeRemindersCount}</span>
-                <span className="stat-label">Активных</span>
-              </div>
-            )}
+          <div className="home-today-reminders">
+            <span className="today-reminders-value">{stats.todayRemindersCount}</span>
+            <span className="today-reminders-label">
+              {stats.todayRemindersCount === 1 
+                ? 'напоминание' 
+                : stats.todayRemindersCount > 1 && stats.todayRemindersCount < 5
+                ? 'напоминания'
+                : 'напоминаний'}
+            </span>
           </div>
         )}
       </Card>
       
-      {/* Быстрые действия */}
+      {/* Клиенты */}
       <Card>
-        <h2 className="home-card-title">Быстрые действия</h2>
+        <h2 className="home-card-title">Клиенты ({stats.clientsCount})</h2>
         <div className="home-actions">
           <Button onClick={handleAddClient} className="action-button">
             <PlusIcon className="action-icon" />

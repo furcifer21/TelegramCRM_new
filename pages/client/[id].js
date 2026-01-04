@@ -14,6 +14,7 @@ import Button from '../../components/Button';
 import Modal from '../../components/Modal';
 import Input from '../../components/Input';
 import Textarea from '../../components/Textarea';
+import { EditIcon, TrashIcon, PlusIcon } from '../../components/Icons';
 
 export default function ClientDetail() {
   const router = useRouter();
@@ -322,13 +323,15 @@ export default function ClientDetail() {
             variant="secondary"
             onClick={() => router.push(`/client/edit/${id}`)}
           >
-            ✏️ Редактировать
+            <EditIcon className="icon" />
+            Редактировать
           </Button>
           <Button
             variant="secondary"
             onClick={handleDelete}
           >
-            🗑️ Удалить
+            <TrashIcon className="icon" />
+            Удалить
           </Button>
         </div>
       </Card>
@@ -341,7 +344,8 @@ export default function ClientDetail() {
             variant="secondary"
             onClick={() => setShowNoteModal(true)}
           >
-            ➕ Добавить
+            <PlusIcon className="icon" />
+            Добавить
           </Button>
         </div>
         
@@ -361,7 +365,7 @@ export default function ClientDetail() {
                     onClick={() => handleDeleteNote(note.id)}
                     className="note-delete-button"
                   >
-                    🗑️
+                    <TrashIcon className="icon" />
                   </Button>
                 </div>
               </div>
@@ -378,7 +382,8 @@ export default function ClientDetail() {
             variant="secondary"
             onClick={() => setShowReminderModal(true)}
           >
-            ➕ Добавить
+            <PlusIcon className="icon" />
+            Добавить
           </Button>
         </div>
         
@@ -412,7 +417,7 @@ export default function ClientDetail() {
                     onClick={() => handleDeleteReminder(reminder.id)}
                     className="reminder-delete-button"
                   >
-                    🗑️
+                    <TrashIcon className="icon" />
                   </Button>
                 </div>
               );

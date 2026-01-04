@@ -110,3 +110,25 @@
   justify-content: center;
 }
 
+.home-today-reminders {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-lg 0;
+  text-align: center;
+}
+
+.today-reminders-value {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--tg-theme-button-color);
+  line-height: 1;
+  margin-bottom: $spacing-sm;
+}
+
+.today-reminders-label {
+  font-size: 16px;
+  color: var(--tg-theme-hint-color);
+}
+

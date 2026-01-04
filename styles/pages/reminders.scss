@@ -39,10 +39,7 @@
 
 .search-input {
   width: 100%;
-  padding: $spacing-sm $spacing-md;
   font-size: 16px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
   background-color: var(--tg-theme-bg-color);
   color: var(--tg-theme-text-color);
   
@@ -182,5 +179,23 @@
     width: 20px;
     height: 20px;
   }
+}
+
+.date-filter-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm 0;
+  
+  p {
+    color: var(--tg-theme-text-color);
+    font-weight: 500;
+    margin: 0;
+  }
+}
+
+.clear-filter-button {
+  font-size: 14px;
+  padding: 6px 12px;
 }
 

@@ -21,6 +21,9 @@ export default function Reminders() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   
+  // Получаем дату из query параметров
+  const dateFilter = router.query.date || '';
+  
   useEffect(() => {
     loadData();
   }, []);
@@ -119,9 +122,15 @@ export default function Reminders() {
   };
   
   /**
-   * Фильтрует напоминания по поисковому запросу
+   * Фильтрует напоминания по поисковому запросу и дате
    */
   const filteredReminders = reminders.filter(reminder => {
+    // Фильтр по дате (если передан в query параметрах)
+    if (dateFilter && reminder.date !== dateFilter) {
+      return false;
+    }
+    
+    // Фильтр по поисковому запросу
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     const clientName = getClientName(reminder.clientId) || '';
@@ -151,6 +160,26 @@ export default function Reminders() {
           </Button>
         </div>
       </div>
+      
+      {/* Фильтр по дате (если передан) */}
+      {dateFilter && (
+        <Card>
+          <div className="date-filter-info">
+            <p>Напоминания на {new Date(dateFilter).toLocaleDateString('ru-RU', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric'
+            })}</p>
+            <Button
+              variant="secondary"
+              onClick={() => router.push('/reminders')}
+              className="clear-filter-button"
+            >
+              Сбросить фильтр
+            </Button>
+          </div>
+        </Card>
+      )}
       
       {/* Поиск */}
       <Card>

@@ -20,7 +20,7 @@
 
 .input-field {
   width: 100%;
-  padding: $spacing-sm $spacing-md;
+  padding: 12px 16px;
   font-size: 16px;
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -46,6 +46,7 @@
   resize: vertical;
   min-height: 80px;
   font-family: inherit;
+  padding: 12px 16px;
 }
 
 .error-text {
@@ -57,5 +58,12 @@
 
 select.input-field {
   cursor: pointer;
+  padding-right: 42px; // 16px (padding) + 10px (отступ стрелки) + 16px (ширина стрелки)
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%23999' d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 }
 

@@ -6,7 +6,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { HomeIcon, UsersIcon } from './Icons';
+import { HomeIcon, UsersIcon, ClockIcon, FileTextIcon, CalendarIcon } from './Icons';
 
 export default function Navigation({ currentPath }) {
   const router = useRouter();
@@ -23,6 +23,22 @@ export default function Navigation({ currentPath }) {
       label: 'Клиенты',
       icon: UsersIcon,
     },
+    {
+      path: '/calendar',
+      label: 'Календарь',
+      icon: CalendarIcon,
+      isCenter: true,
+    },
+    {
+      path: '/reminders',
+      label: 'Напоминания',
+      icon: ClockIcon,
+    },
+    {
+      path: '/notes',
+      label: 'Заметки',
+      icon: FileTextIcon,
+    },
   ];
   
   return (
@@ -35,10 +51,10 @@ export default function Navigation({ currentPath }) {
           <Link
             key={item.path}
             href={item.path}
-            className={`nav-item ${isActive ? 'active' : ''}`}
+            className={`nav-item ${isActive ? 'active' : ''} ${item.isCenter ? 'nav-item-center' : ''}`}
+            title={item.label}
           >
-            <IconComponent className="nav-icon" />
-            <span className="nav-label">{item.label}</span>
+            <IconComponent className={`nav-icon ${item.isCenter ? 'nav-icon-center' : ''}`} />
           </Link>
         );
       })}

@@ -12,6 +12,7 @@ import { getTelegramWebApp } from '../lib/telegram';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import Input from '../components/Input';
+import { PlusIcon, EditIcon, TrashIcon } from '../components/Icons';
 
 export default function Clients() {
   const router = useRouter();
@@ -110,8 +111,8 @@ export default function Clients() {
     <div className="clients-page">
       <div className="page-header">
         <h1 className="page-title">Клиенты</h1>
-        <Button onClick={() => router.push('/client/new')}>
-          ➕ Добавить
+        <Button onClick={() => router.push('/client/new')} className="icon-button">
+          <PlusIcon className="icon" />
         </Button>
       </div>
       
@@ -172,14 +173,14 @@ export default function Clients() {
                   onClick={() => router.push(`/client/edit/${client.id}`)}
                   className="client-action-button"
                 >
-                  ✏️
+                  <EditIcon className="icon" />
                 </Button>
                 <Button
                   variant="secondary"
                   onClick={() => handleDelete(client.id, client.name)}
                   className="client-action-button"
                 >
-                  🗑️
+                  <TrashIcon className="icon" />
                 </Button>
               </div>
             </Card>

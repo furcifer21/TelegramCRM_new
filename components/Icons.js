@@ -54,3 +54,7 @@ export const FilterIcon = ({ className = '', width, height }) => (
   <Icon name="filter" className={className} width={width} height={height} />
 );
 
+export const CalendarIcon = ({ className = '', width, height }) => (
+  <Icon name="calendar" className={className} width={width} height={height} />
+);
+
