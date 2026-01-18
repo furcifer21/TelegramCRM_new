@@ -1,6 +1,6 @@
 /**
  * Главная страница CRM системы
- * 
+ *
  * Предоставляет быстрый доступ к основным функциям:
  * - Добавление клиента
  * - Просмотр всех клиентов
@@ -20,7 +20,10 @@ import { ClockIcon, FileTextIcon, UsersIcon, PlusIcon, InfoIcon } from '../compo
 
 export default function Home() {
   const router = useRouter();
-  const [user] = useState(getTelegramUser());
+
+  // ИСПРАВЛЕНИЕ 1: Инициализируем user как null, чтобы HTML сервера и клиента совпадал
+  const [user, setUser] = useState(null);
+
   const { setLoading: setGlobalLoading } = useLoader();
   const [stats, setStats] = useState({
     clientsCount: 0,
@@ -31,21 +34,27 @@ export default function Home() {
   });
   const [loading, setLoading] = useState(true);
   const [showInfoModal, setShowInfoModal] = useState(false);
-  
-  const webApp = getTelegramWebApp();
-  
-  // Загружаем статистику при загрузке страницы
+
+  // ИСПРАВЛЕНИЕ 2: Убрали getTelegramWebApp() из тела компонента, чтобы не ломать SSR
+
+  // Загружаем статистику и пользователя при загрузке страницы (Client-side)
   useEffect(() => {
+    // Безопасно получаем пользователя
+    const telegramUser = getTelegramUser();
+    if (telegramUser) {
+      setUser(telegramUser);
+    }
+
     loadStats();
-    
+
     // Проверяем активные напоминания каждую минуту
     const interval = setInterval(() => {
       checkActiveReminders();
     }, 60000); // Каждую минуту
-    
+
     return () => clearInterval(interval);
   }, []);
-  
+
   /**
    * Загружает статистику (количество клиентов, напоминаний)
    */
@@ -59,11 +68,11 @@ export default function Home() {
         getActiveReminders(),
         getNotes()
       ]);
-      
+
       // Подсчитываем напоминания на сегодня
       const today = new Date().toISOString().split('T')[0];
       const todayReminders = reminders.filter(reminder => reminder.date === today);
-      
+
       setStats({
         clientsCount: clients.length,
         remindersCount: reminders.length,
@@ -78,22 +87,27 @@ export default function Home() {
       setGlobalLoading(false);
     }
   };
-  
+
   /**
    * Проверяет активные напоминания и показывает уведомления
    */
   const checkActiveReminders = async () => {
     try {
+      // ИСПРАВЛЕНИЕ 3: Получаем webApp здесь, так как эта функция работает только в браузере
+      const webApp = getTelegramWebApp();
       const activeReminders = await getActiveReminders();
-      
+
       if (activeReminders.length > 0 && webApp) {
         // Показываем уведомление о напоминаниях
         const reminderText = activeReminders.length === 1
-          ? activeReminders[0].text
-          : `У вас ${activeReminders.length} активных напоминаний`;
-        
-        webApp.showAlert(reminderText);
-        
+            ? activeReminders[0].text
+            : `У вас ${activeReminders.length} активных напоминаний`;
+
+        // Проверка наличия метода перед вызовом
+        if (webApp.showAlert) {
+          webApp.showAlert(reminderText);
+        }
+
         // Тактильная обратная связь
         if (webApp.HapticFeedback) {
           webApp.HapticFeedback.notificationOccurred('success');
@@ -103,56 +117,57 @@ export default function Home() {
       console.error('Error checking reminders:', error);
     }
   };
-  
+
   /**
    * Переход на страницу добавления клиента
    */
   const handleAddClient = () => {
     router.push('/client/new');
   };
-  
+
   /**
    * Переход на страницу списка клиентов
    */
   const handleViewClients = () => {
     router.push('/clients');
   };
-  
+
   /**
    * Переход на страницу создания напоминания
    */
   const handleCreateReminder = () => {
     router.push('/reminder/new');
   };
-  
+
   /**
    * Переход на страницу всех напоминаний
    */
   const handleViewReminders = () => {
     router.push('/reminders');
   };
-  
+
   /**
    * Переход на страницу всех заметок
    */
   const handleViewNotes = () => {
     router.push('/notes');
   };
-  
+
   /**
    * Переход на страницу создания заметки
    */
   const handleCreateNote = () => {
     router.push('/notes/new');
   };
-  
+
   return (
     <div className="home">
       <div className="home-title-wrapper">
         <h1 className="home-title">
+          {/* Условие отработает только после гидратации на клиенте */}
           {user ? `Привет, ${user.first_name}!` : 'CRM система'}
         </h1>
-        <button 
+        <button
           className="home-info-button"
           onClick={() => setShowInfoModal(true)}
           aria-label="Информация о приложении"
@@ -160,7 +175,7 @@ export default function Home() {
           <InfoIcon className="home-info-icon" width={20} height={20} />
         </button>
       </div>
-      
+
       {/* Модалка с информацией о приложении */}
       <Modal
         isOpen={showInfoModal}
@@ -171,12 +186,12 @@ export default function Home() {
           <div className="app-info-section">
             <h3 className="app-info-section-title">Для кого</h3>
             <p className="app-info-text">
-              CRM система для управления клиентами, событиями и заметками. 
-              Подходит для малого бизнеса, фрилансеров и всех, кому нужно 
+              CRM система для управления клиентами, событиями и заметками.
+              Подходит для малого бизнеса, фрилансеров и всех, кому нужно
               организовать работу с клиентами.
             </p>
           </div>
-          
+
           <div className="app-info-section">
             <h3 className="app-info-section-title">Основные возможности</h3>
             <ul className="app-info-list">
@@ -194,7 +209,7 @@ export default function Home() {
               </li>
             </ul>
           </div>
-          
+
           <div className="app-info-section">
             <h3 className="app-info-section-title">Преимущества</h3>
             <ul className="app-info-list">
@@ -213,14 +228,14 @@ export default function Home() {
             </ul>
           </div>
         </div>
-        
+
         <div className="app-info-actions">
           <Button onClick={() => setShowInfoModal(false)}>
             Понятно
           </Button>
         </div>
       </Modal>
-      
+
       {/* События сегодня */}
       <Card>
         <h2 className="home-card-title">События сегодня</h2>
@@ -228,8 +243,8 @@ export default function Home() {
           <div className="home-today-reminders">
             <span className="today-reminders-value">{stats.todayRemindersCount}</span>
             <span className="today-reminders-label">
-              {stats.todayRemindersCount === 1 
-                ? 'событие' 
+              {stats.todayRemindersCount === 1
+                ? 'событие'
                 : stats.todayRemindersCount > 1 && stats.todayRemindersCount < 5
                 ? 'события'
                 : 'событий'}
@@ -237,7 +252,7 @@ export default function Home() {
           </div>
         )}
       </Card>
-      
+
       {/* Клиенты */}
       <Card>
         <h2 className="home-card-title">Клиенты ({stats.clientsCount})</h2>
@@ -252,7 +267,7 @@ export default function Home() {
           </Button>
         </div>
       </Card>
-      
+
       {/* События */}
       <Card>
         <h2 className="home-card-title">События</h2>
@@ -267,7 +282,7 @@ export default function Home() {
           </Button>
         </div>
       </Card>
-      
+
       {/* Заметки */}
       <Card>
         <h2 className="home-card-title">Заметки</h2>
@@ -282,7 +297,7 @@ export default function Home() {
           </Button>
         </div>
       </Card>
-      
+
       {/* Информация о пользователе (если в Telegram) */}
       {user && (
         <Card>
@@ -296,4 +311,3 @@ export default function Home() {
     </div>
   );
 }
-
