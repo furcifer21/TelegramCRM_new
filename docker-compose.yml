@@ -1,14 +1,32 @@
-version: '3.8'
 services:
   nodejs:
     image: node:20
     container_name: tgcrm
     restart: 'no'
     working_dir: /var/www/html
+    build: .
     ports:
-      - 3000:3000
+      - 8000:3000
     volumes:
       - ./:/var/www/html
     command: sh -c "npm install && npm run dev"
     environment:
       - NODE_TLS_REJECT_UNAUTHORIZED=0 # только для локальной разработки, для отключения проверки SSL/TLS
+      - TZ=Europe/Kiev
+  cron:
+    image: alpine:latest
+    container_name: tgcrm-cron
+    restart: unless-stopped
+    # Устанавливаем curl и запускаем бесконечный цикл
+    command: >
+      sh -c "apk add --no-cache curl && 
+      echo 'Cron container started' && 
+      while true; do 
+        echo 'Pinging cron...' && 
+        curl -s http://tgcrm:3000/api/cron > /dev/null; 
+        sleep 60; 
+      done"
+    depends_on:
+      - nodejs
+    environment:
+      - TZ=Europe/Kiev
