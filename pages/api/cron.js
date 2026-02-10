@@ -66,33 +66,72 @@ export default async function handler(req, res) {
             debugLog.push(`Processing Reminder ID: ${reminder.id}. Target UserID: ${userId} (Is UUID: ${isUuid})`);
 
             if (!userId) {
-                debugLog.push(`ERROR: UserID is empty. Cannot send.`);
-                continue;
-            }
-
-            if (isUuid) {
-                debugLog.push(`WARNING: UserID looks like a UUID, not a Telegram ID. Telegram API will likely fail.`);
-            }
-
-            // Отправляем сообщение
-            const result = await sendTelegramMessage(
-                userId,
-                `🔔 <b>Напоминание!</b>\n\n${reminder.text}`
-            );
-
-            if (result.success) {
-                debugLog.push(`SUCCESS: Message sent to ${userId}`);
-
-                // Помечаем как отправленное
-                await supabase
-                    .from('reminders')
-                    .update({ notified: true, archived: true })
-                    .eq('id', reminder.id);
-
-                notificationsSent.push(reminder.id);
+                debugLog.push(`ERROR: UserID is empty. Cannot send to owner.`);
             } else {
-                debugLog.push(`FAIL: Telegram Error for ${userId}: ${JSON.stringify(result.error)}`);
+                if (isUuid) {
+                    debugLog.push(`WARNING: UserID looks like a UUID, not a Telegram ID. Telegram API will likely fail.`);
+                }
+
+                // Текст напоминания с датой/временем
+                const dateTime = (reminder.date && reminder.time)
+                    ? `${reminder.date} ${reminder.time}`
+                    : '';
+                const baseText = `🔔 <b>Напоминание!</b>\n\n${reminder.text || ''}`;
+                const fullText = dateTime ? `${baseText}\n\n🗓 ${dateTime}` : baseText;
+
+                // Отправляем сообщение владельцу
+                const ownerResult = await sendTelegramMessage(
+                    userId,
+                    fullText
+                );
+
+                if (ownerResult.success) {
+                    debugLog.push(`SUCCESS: Message sent to owner ${userId}`);
+                } else {
+                    debugLog.push(`FAIL: Telegram Error for owner ${userId}: ${JSON.stringify(ownerResult.error)}`);
+                }
             }
+
+            // Если напоминание привязано к клиенту — пробуем отправить ему
+            if (reminder.client_id) {
+                const { data: client, error: clientError } = await supabase
+                    .from('clients')
+                    .select('telegram_chat_id, telegram_username')
+                    .eq('id', reminder.client_id)
+                    .single();
+
+                if (clientError) {
+                    debugLog.push(`Client load error for reminder ${reminder.id}: ${JSON.stringify(clientError)}`);
+                } else if (client && client.telegram_chat_id) {
+                    const dateTime = (reminder.date && reminder.time)
+                        ? `${reminder.date} ${reminder.time}`
+                        : '';
+                    const baseTextForClient = `🔔 <b>Напоминание!</b>\n\n${reminder.text || ''}`;
+                    const fullTextForClient = dateTime ? `${baseTextForClient}\n\n🗓 ${dateTime}` : baseTextForClient;
+
+                    const clientResult = await sendTelegramMessage(
+                        client.telegram_chat_id,
+                        fullTextForClient
+                    );
+
+                    if (clientResult.success) {
+                        debugLog.push(`SUCCESS: Message sent to client chat ${client.telegram_chat_id}`);
+                    } else {
+                        debugLog.push(`FAIL: Telegram Error for client chat ${client.telegram_chat_id}: ${JSON.stringify(clientResult.error)}`);
+                    }
+                } else {
+                    debugLog.push(`Client for reminder ${reminder.id} has no telegram_chat_id.`);
+                }
+            }
+
+            // В любом случае помечаем напоминание как отправленное/архивное,
+            // чтобы не слать его повторно
+            await supabase
+                .from('reminders')
+                .update({ notified: true, archived: true })
+                .eq('id', reminder.id);
+
+            notificationsSent.push(reminder.id);
         }
 
         res.status(200).json({

@@ -10,7 +10,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { initTelegramWebApp, getTelegramWebApp } from '../lib/telegram';
-import { getActiveReminders, markReminderAsNotified } from '../lib/crm';
 import Navigation from './Navigation';
 import Loader from './Loader';
 import { LoaderProvider, useLoader } from '../contexts/LoaderContext';
@@ -65,50 +64,12 @@ function LayoutContent({ children }) {
       });
     }
     
-    // Проверяем активные напоминания каждую минуту
-    const checkReminders = async () => {
-      try {
-        const activeReminders = await getActiveReminders();
-        
-        if (activeReminders.length > 0 && webApp) {
-          // Показываем уведомление для каждого активного напоминания
-          for (const reminder of activeReminders) {
-            // Формируем текст сообщения
-            const messageText = `⏰ Событие\n\n${reminder.text || 'У вас есть событие!'}`;
-            
-            // Показываем уведомление в чате через showAlert
-            webApp.showAlert(messageText);
-            
-            // Отправляем данные в бота (если бэкенд настроен)
-            // webApp.sendData(JSON.stringify({ type: 'reminder', id: reminder.id, text: reminder.text }));
-            
-            // Помечаем как уведомленное и архивируем
-            await markReminderAsNotified(reminder.id);
-            
-            // Тактильная обратная связь
-            if (webApp.HapticFeedback) {
-              webApp.HapticFeedback.notificationOccurred('success');
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error checking reminders:', error);
-      }
-    };
-    
-    // Проверяем сразу при загрузке
-    checkReminders();
-    
-    // Проверяем каждую минуту
-    const reminderInterval = setInterval(checkReminders, 60000);
-    
     // Cleanup при размонтировании компонента
     return () => {
       if (webApp) {
         webApp.offEvent('viewportChanged', () => {});
         webApp.offEvent('themeChanged', () => {});
       }
-      clearInterval(reminderInterval);
     };
   }, []);
   

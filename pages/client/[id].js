@@ -15,7 +15,7 @@ export async function getServerSideProps() {
   };
 }
 import { getClient, deleteClient, getClientNotes, getClientReminders, createNote, deleteNote, createReminder, deleteReminder } from '../../lib/crm';
-import { getTelegramWebApp } from '../../lib/telegram';
+import { getTelegramWebApp, getTelegramUser } from '../../lib/telegram';
 import { useLoader } from '../../contexts/LoaderContext';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
@@ -29,6 +29,8 @@ export default function ClientDetail() {
   const { id } = router.query;
   const webApp = getTelegramWebApp();
   const { setLoading: setGlobalLoading } = useLoader();
+  // Замените на реальное имя вашего бота (без @)
+  const BOT_USERNAME = 'FlexCRMbot';
   
   const [client, setClient] = useState(null);
   const [notes, setNotes] = useState([]);
@@ -46,6 +48,7 @@ export default function ClientDetail() {
     date: new Date().toISOString().split('T')[0],
     time: '09:00',
   });
+  const [telegramUser, setTelegramUser] = useState(null);
   
   // Загружаем данные при загрузке страницы
   useEffect(() => {
@@ -53,6 +56,14 @@ export default function ClientDetail() {
       loadData();
     }
   }, [id]);
+
+  // Получаем текущего Telegram-пользователя (владельца CRM) для формирования ссылки
+  useEffect(() => {
+    const user = getTelegramUser();
+    if (user) {
+      setTelegramUser(user);
+    }
+  }, []);
   
   /**
    * Загружает данные клиента, заметки и напоминания
@@ -293,6 +304,12 @@ export default function ClientDetail() {
   if (!client) {
     return null;
   }
+
+  // Генерируем персональную ссылку для привязки Telegram клиента к этой карточке
+  const inviteLink =
+    telegramUser && id && BOT_USERNAME
+      ? `https://t.me/${BOT_USERNAME}?start=link_${telegramUser.id}_${id}`
+      : null;
   
   return (
     <div className="client-detail-page">
@@ -334,6 +351,45 @@ export default function ClientDetail() {
               <p className="info-value">{client.notes}</p>
             </div>
           )}
+
+          {/* Блок Telegram-связки клиента */}
+          <div className="info-row">
+            <span className="info-label">Telegram:</span>
+            <div className="info-value">
+              {client?.telegramChatId ? (
+                <span>
+                  Подключен
+                  {client.telegramUsername ? ` (@${client.telegramUsername})` : ''}
+                </span>
+              ) : inviteLink ? (
+                <button
+                  type="button"
+                  className="info-link"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(inviteLink);
+                      if (webApp) {
+                        webApp.showAlert('Ссылка скопирована. Отправьте её клиенту в любом мессенджере.');
+                      } else {
+                        alert('Ссылка скопирована. Отправьте её клиенту в любом мессенджере.');
+                      }
+                    } catch (e) {
+                      console.error('Error copying invite link:', e);
+                      if (webApp) {
+                        webApp.showAlert('Не удалось скопировать ссылку.');
+                      } else {
+                        alert('Не удалось скопировать ссылку.');
+                      }
+                    }
+                  }}
+                >
+                  Скопировать ссылку для подключения
+                </button>
+              ) : (
+                <span>Недоступно</span>
+              )}
+            </div>
+          </div>
         </div>
         
         <div className="client-actions">

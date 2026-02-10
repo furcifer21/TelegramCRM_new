@@ -31,7 +31,8 @@ CRM система, интегрированная с Telegram через Mini A
 ### 3. Напоминания
 - ✅ Создание напоминаний с датой и временем
 - ✅ Привязка напоминаний к клиентам (опционально)
-- ✅ Автоматические уведомления в Telegram
+- ✅ Автоматические уведомления в Telegram через бота
+- ✅ Отправка напоминаний владельцу и клиенту (если клиент привязан к боту)
 - ✅ Просмотр активных напоминаний
 
 ### 4. Фильтрация и поиск
@@ -74,6 +75,11 @@ CREATE TABLE IF NOT EXISTS clients (
   email TEXT,
   company TEXT,
   notes TEXT,
+  -- Связка с Telegram-ботом (клиент)
+  telegram_username TEXT,
+  telegram_chat_id BIGINT,
+  telegram_first_name TEXT,
+  telegram_last_name TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -133,6 +139,12 @@ CREATE INDEX IF NOT EXISTS idx_reminders_archived ON reminders(archived);
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS user_id TEXT;
 ALTER TABLE notes ADD COLUMN IF NOT EXISTS user_id TEXT;
 ALTER TABLE reminders ADD COLUMN IF NOT EXISTS user_id TEXT;
+
+-- Добавляем поля для Telegram-связки клиентов (если их ещё нет)
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS telegram_username TEXT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS telegram_chat_id BIGINT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS telegram_first_name TEXT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS telegram_last_name TEXT;
 
 -- Обновляем существующие записи (если есть)
 -- ВНИМАНИЕ: Это установит user_id = 'default' для всех существующих записей
@@ -233,11 +245,15 @@ CREATE POLICY "Allow all for settings" ON settings FOR ALL USING (true) WITH CHE
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+
+# Токен Telegram-бота (из BotFather), используется для отправки сообщений
+BOT_SECRET=123456:ABC-DEF...
 ```
 
-2. Замените значения на ваши данные из Supabase:
-   - **NEXT_PUBLIC_SUPABASE_URL** - найдите в Supabase: Settings → API → Project URL
-   - **NEXT_PUBLIC_SUPABASE_ANON_KEY** - найдите в Supabase: Settings → API → anon public
+2. Замените значения на ваши данные из Supabase и BotFather:
+- **NEXT_PUBLIC_SUPABASE_URL** - найдите в Supabase: Settings → API → Project URL
+- **NEXT_PUBLIC_SUPABASE_ANON_KEY** - найдите в Supabase: Settings → API → anon public
+- **BOT_SECRET** - токен бота из BotFather
 
 2. Замените значения на ваши данные из Supabase:
    - **NEXT_PUBLIC_SUPABASE_URL** - найдите в Supabase: Settings → API → Project URL
@@ -279,20 +295,27 @@ telegram-crm/
 │   ├── Textarea.js      # Компонент многострочного ввода
 │   └── Modal.js         # Компонент модального окна
 ├── lib/                 # Утилиты и библиотеки
-│   ├── telegram.js      # Работа с Telegram WebApp API
-│   ├── api.js           # Функции для API запросов
-│   ├── supabase.js      # Утилита для работы с Supabase
-│   └── crm.js           # Утилиты для работы с данными CRM
+│   ├── telegram.js        # Работа с Telegram WebApp API (Mini App)
+│   ├── telegram-server.js # Парсинг initData и user_id на сервере
+│   ├── telegram-bot.js    # Отправка сообщений в Telegram Bot API
+│   ├── api.js             # Функции для API запросов
+│   ├── supabase.js        # Утилита для работы с Supabase
+│   └── crm.js             # Утилиты для работы с данными CRM
 ├── pages/               # Страницы Next.js
 │   ├── _app.js          # Точка входа приложения (с keep-alive)
 │   ├── index.js         # Главная страница
-│   ├── clients.js       # Список клиентов
-│   ├── api/             # API endpoints
-│   │   ├── clients.js   # API для клиентов
-│   │   ├── notes.js     # API для заметок
-│   │   ├── reminders.js # API для напоминаний
-│   │   ├── settings.js  # API для настроек
-│   │   └── keep-alive.js # Keep-alive для Supabase
+│   ├── clients.js         # Список клиентов
+│   ├── api/               # API endpoints
+│   │   ├── clients.js     # API для клиентов (общий)
+│   │   ├── clients/[id].js# API для одного клиента
+│   │   ├── notes.js       # API для заметок
+│   │   ├── notes/[id].js  # API для одной заметки
+│   │   ├── reminders.js   # API для напоминаний (создание/список)
+│   │   ├── reminders/[id].js # API для одного напоминания
+│   │   ├── settings.js    # API для настроек
+│   │   ├── telegram-webhook.js # Webhook для Telegram-бота (/start link_...)
+│   │   ├── cron.js        # Крон-эндпоинт для отправки напоминаний через бота
+│   │   └── keep-alive.js  # Keep-alive для Supabase
 │   ├── client/          # Страницы работы с клиентами
 │   │   ├── new.js       # Создание нового клиента
 │   │   ├── [id].js      # Карточка клиента
@@ -350,10 +373,12 @@ telegram-crm/
 3. Заполните форму
 4. Нажмите "Сохранить"
 
-#### Автоматические уведомления
-- Система автоматически проверяет напоминания каждую минуту
-- При наступлении времени напоминания вы получите уведомление в Telegram
-- Напоминание будет помечено как уведомленное
+#### Автоматические уведомления через бота
+- Отдельный крон-скрипт (или внешний планировщик) периодически вызывает `/api/cron`
+- Эндпоинт `/api/cron` находит все напоминания с наступившим временем (`notified = false`, `archived = false`)
+- Если напоминание не привязано к клиенту — бот шлёт сообщение **владельцу**
+- Если напоминание привязано к клиенту и у него есть `telegram_chat_id` — бот шлёт сообщение **и владельцу, и клиенту**
+- После успешной отправки напоминание помечается как `notified = true` и `archived = true`
 
 ### Заметки
 
@@ -381,11 +406,32 @@ telegram-crm/
 ### Настройка бота в Telegram
 
 1. Создайте бота через [@BotFather](https://t.me/BotFather)
-2. Получите токен бота
+2. Получите токен бота и сохраните его в `BOT_SECRET`
 3. Установите Web App URL через команду `/newapp` или `/setmenubutton`
 4. Укажите URL вашего приложения (должен быть HTTPS в production)
+5. Настройте webhook для привязки клиентов к боту:
+   ```text
+   https://api.telegram.org/bot<ВАШ_BOT_TOKEN>/setWebhook?url=https://ВАШ_ДОМЕН/api/telegram-webhook
+   ```
+6. Проверьте текущее состояние webhook:
+   ```text
+   https://api.telegram.org/bot<ВАШ_BOT_TOKEN>/getWebhookInfo
+   ```
 
-**Важно:** Telegram требует HTTPS для работы Mini App в production!
+**Важно:** Telegram требует HTTPS для работы Mini App и webhook'ов в production!
+
+### Связка клиента CRM с его Telegram
+
+1. Откройте карточку нужного клиента в CRM
+2. В блоке `Telegram`:
+   - если клиент ещё не подключён — будет доступна кнопка **«Скопировать ссылку для подключения»**
+   - если клиент уже подключён — будет указан статус «Подключен (@username)»
+3. Отправьте скопированную ссылку клиенту в любом мессенджере
+4. Клиент нажимает ссылку → открывается ваш бот с командой `/start link_<ownerId>_<clientId>`
+5. Telegram отправляет апдейт на `/api/telegram-webhook`, а сервер:
+   - находит нужного клиента в таблице `clients`
+   - записывает `telegram_chat_id`, `telegram_username`, `telegram_first_name`, `telegram_last_name`
+6. После этого все напоминания, привязанные к этому клиенту, могут отправляться боту не только владельцу, но и самому клиенту
 
 ### Хранение данных
 
@@ -644,7 +690,8 @@ MIT
 
 ### Production
 
-- Напоминания проверяются только когда приложение открыто
+- Напоминания отправляются через эндпоинт `/api/cron`, поэтому Mini App может быть закрыта
+- Необходимо настроить внешний планировщик (cron, GitHub Actions, UptimeRobot и т.п.), который будет регулярно вызывать `/api/cron`
 - На бесплатном тарифе Supabase база данных может уходить в сон после 1 недели неактивности (keep-alive механизм предотвращает это)
 - Keep-alive запросы выполняются только когда приложение открыто в браузере
 
